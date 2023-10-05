@@ -8,5 +8,5 @@ public interface IApplicationService {
 
   void validate();
 
-  String transform();
+  void transform();
 }

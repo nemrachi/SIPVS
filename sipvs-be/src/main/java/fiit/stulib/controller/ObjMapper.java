@@ -18,10 +18,9 @@ public class ObjMapper {
     }
     LibraryLoan obj = new LibraryLoan();
     obj.setLoanId(dto.getLoanId());
-    obj.setDateOfLoan(dto.getDateOfLoan());
-    obj.setDueDate(dto.getDueDate());
     obj.setBorrower(ObjMapper.fromDto(dto.getBorrower()));
     obj.setLoanedBooks(ObjMapper.fromListDto(dto.getLoanedBooks()));
+    obj.setLibrarianId(dto.getLibrarianId());
     return obj;
   }
 
@@ -30,8 +29,6 @@ public class ObjMapper {
       return null;
     }
     Borrower obj = new Borrower();
-    obj.setName(dto.getName());
-    obj.setSurname(dto.getSurname());
     obj.setCardNumber(dto.getCardNumber());
     return obj;
   }
@@ -52,11 +49,7 @@ public class ObjMapper {
       return null;
     }
     Book obj = new Book();
-    obj.setTitle(dto.getTitle());
-    obj.setAuthor(dto.getAuthor());
-    obj.setPublishedIn(dto.getPublishedIn());
     obj.setIsbn(dto.getIsbn());
-    obj.setPublisher(dto.getPublisher());
     return obj;
   }
 }

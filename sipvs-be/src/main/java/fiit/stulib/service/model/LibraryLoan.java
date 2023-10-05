@@ -11,4 +11,5 @@ public class LibraryLoan {
   private String dateOfLoan;
   private String dueDate;
   private List<Book> loanedBooks;
+  private Integer librarianId;
 }

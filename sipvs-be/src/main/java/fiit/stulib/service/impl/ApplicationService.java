@@ -16,7 +16,7 @@ public class ApplicationService implements IApplicationService {
   }
 
   @Override
-  public String transform() {
-    return null;
+  public void transform() {
+
   }
 }

@@ -8,13 +8,7 @@ import javax.validation.constraints.Size;
 @Data
 public class BorrowerDto {
 
-  @Size(max = 50)
-  private String name;
-
-  @Size(max = 50)
-  private String surname;
-
-  @Size(max = 15)
   @NotNull
+  @Size(max = 7)
   private String cardNumber;
 }

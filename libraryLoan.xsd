@@ -2,15 +2,15 @@
 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
            elementFormDefault="qualified"
            targetNamespace="http://www.library.com/loan"
-           xmlns:loan="http://www.library.com/loan">
+           xmlns:l="http://www.library.com/loan">
     <xs:element name="libraryLoan">
         <xs:complexType>
             <xs:sequence>
-                <xs:element ref="loan:librarianId"/>
-                <xs:element ref="loan:borrower"/>
-                <xs:element ref="loan:dateOfLoan"/>
-                <xs:element ref="loan:dueDate"/>
-                <xs:element ref="loan:borrowedBooks"/>
+                <xs:element ref="l:librarianId"/>
+                <xs:element ref="l:borrower"/>
+                <xs:element ref="l:dateOfLoan"/>
+                <xs:element ref="l:dueDate"/>
+                <xs:element ref="l:borrowedBooks"/>
             </xs:sequence>
             <xs:attribute name="loan_id" use="required">
                 <xs:simpleType>
@@ -25,7 +25,7 @@
     <xs:element name="borrower">
         <xs:complexType>
             <xs:sequence>
-                <xs:element ref="loan:cardNumber"/>
+                <xs:element ref="l:cardNumber"/>
             </xs:sequence>
         </xs:complexType>
     </xs:element>
@@ -41,14 +41,14 @@
     <xs:element name="borrowedBooks">
         <xs:complexType>
             <xs:sequence>
-                <xs:element maxOccurs="unbounded" ref="loan:book"/>
+                <xs:element maxOccurs="unbounded" ref="l:book"/>
             </xs:sequence>
         </xs:complexType>
     </xs:element>
     <xs:element name="book">
         <xs:complexType>
             <xs:sequence>
-                <xs:element ref="loan:isbn"/>
+                <xs:element ref="l:isbn"/>
             </xs:sequence>
         </xs:complexType>
     </xs:element>

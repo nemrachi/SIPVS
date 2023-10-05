@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<libraryLoan loan_id="L000001" xmlns="http://www.library.com/loan">
+    <librarianId>1</librarianId>
+    <borrower>
+        <cardNumber>AB12345</cardNumber>
+    </borrower>
+    <dateOfLoan>2023-10-03</dateOfLoan>
+    <dueDate>2023-10-03</dueDate>
+    <borrowedBooks>
+        <book>
+            <isbn>9788010034666</isbn>
+        </book>
+        <book>
+            <isbn>9788055130996</isbn>
+        </book>
+        <book>
+            <isbn>9788056634462</isbn>
+        </book>
+    </borrowedBooks>
+</libraryLoan>

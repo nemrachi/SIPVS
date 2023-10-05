@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
+           elementFormDefault="qualified"
+           targetNamespace="http://www.library.com/loan"
+           xmlns:loan="http://www.library.com/loan">
+    <xs:element name="libraryLoan">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element ref="loan:librarianId"/>
+                <xs:element ref="loan:borrower"/>
+                <xs:element ref="loan:dateOfLoan"/>
+                <xs:element ref="loan:dueDate"/>
+                <xs:element ref="loan:borrowedBooks"/>
+            </xs:sequence>
+            <xs:attribute name="loan_id" use="required">
+                <xs:simpleType>
+                    <xs:restriction base="xs:string">
+                        <xs:pattern value="[A-Z][0-9]{6}"/>
+                    </xs:restriction>
+                </xs:simpleType>
+            </xs:attribute>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="librarianId" type="xs:integer"/>
+    <xs:element name="borrower">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element ref="loan:cardNumber"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="cardNumber">
+        <xs:simpleType>
+            <xs:restriction base="xs:string">
+                <xs:pattern value="[A-Z0-9]{7}" />
+            </xs:restriction>
+        </xs:simpleType>
+    </xs:element>
+    <xs:element name="dateOfLoan" type="xs:date"/>
+    <xs:element name="dueDate" type="xs:date"/>
+    <xs:element name="borrowedBooks">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element maxOccurs="unbounded" ref="loan:book"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="book">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element ref="loan:isbn"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="isbn">
+        <xs:simpleType>
+            <xs:restriction base="xs:string">
+                <xs:pattern value="[0-9]{10}|[0-9]{13}" />
+            </xs:restriction>
+        </xs:simpleType>
+    </xs:element>
+</xs:schema>

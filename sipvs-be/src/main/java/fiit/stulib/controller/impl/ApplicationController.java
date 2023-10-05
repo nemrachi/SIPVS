@@ -17,15 +17,19 @@ public class ApplicationController implements IApplicationController {
   @Autowired
   private IApplicationService applicationService;
 
+  @Override
   public void save(LibraryLoanDto libraryLoanDto) {
     applicationService.save(ObjMapper.fromDto(libraryLoanDto));
   }
 
+  @Override
   public void validate() {
     applicationService.validate();
   }
 
+  @Override
   public void transform() {
     applicationService.transform();
   }
+
 }

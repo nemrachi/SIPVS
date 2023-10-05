@@ -1,4 +1,4 @@
-package fiit.stulib.controller.dto;
+package fiit.stulib.sipvsbe.controller.dto;
 
 import lombok.Data;
 
@@ -8,7 +8,7 @@ import javax.validation.constraints.Size;
 @Data
 public class BorrowerDto {
 
-  @NotNull
-  @Size(max = 7)
-  private String cardNumber;
+    @NotNull
+    @Size(max = 7)
+    private String cardNumber;
 }

@@ -42,7 +42,7 @@ public class ApplicationService implements IApplicationService {
             File xmlFile = new File("src/main/resources/templates/libraryLoan.xml");
             marshaller.marshal(libraryLoan, xmlFile);
 
-            System.out.println("LibraryLoan object saved to library_loan.xml");
+            System.out.println("LibraryLoan object saved to libraryLoan.xml");
         } catch (JAXBException e) {
             System.out.println(e.getMessage());
             throw new RuntimeException(e.getMessage());
@@ -63,7 +63,7 @@ public class ApplicationService implements IApplicationService {
             Validator validator = schema.newValidator();
 
             // Validate the XML file (replace with your XML file)
-            validator.validate(new StreamSource(new File("library_loan.xml")));
+            validator.validate(new StreamSource(new File("libraryLoan.xml")));
 
             System.out.println("Validation successful. XML is valid against the XSD.");
         } catch (SAXException e) {
@@ -86,7 +86,7 @@ public class ApplicationService implements IApplicationService {
             Transformer transformer = transformerFactory.newTransformer(xslt);
 
             // Load the input XML file (replace with your XML file)
-            Source xmlInput = new StreamSource(new File("library_loan.xml"));
+            Source xmlInput = new StreamSource(new File("libraryLoan.xml"));
 
             // Perform the transformation and save the result to an HTML file
             transformer.transform(xmlInput, new StreamResult(new File("output.html")));

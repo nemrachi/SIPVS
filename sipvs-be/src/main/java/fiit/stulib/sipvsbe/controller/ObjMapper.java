@@ -21,6 +21,8 @@ public class ObjMapper {
         obj.setBorrower(ObjMapper.fromDto(dto.getBorrower()));
         obj.setLoanedBooks(ObjMapper.fromListDto(dto.getLoanedBooks()));
         obj.setLibrarianId(dto.getLibrarianId());
+        obj.setDueDate(dto.getDueDate().toString());
+        obj.setDateOfLoan(dto.getDateOfLoan().toString());
         return obj;
     }
 

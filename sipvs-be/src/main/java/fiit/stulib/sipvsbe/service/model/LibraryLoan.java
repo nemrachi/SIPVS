@@ -10,23 +10,22 @@ import java.util.List;
 @XmlAccessorType(XmlAccessType.FIELD)
 public class LibraryLoan {
 
-    @XmlElement
+    @XmlElement(name = "loanId")
     private String loanId;
 
-    @XmlElement
     private Borrower borrower;
 
-    @XmlElement
+    @XmlElement(name = "dateOfLoan")
     private String dateOfLoan;
 
-    @XmlElement
+    @XmlElement(name = "dueDate")
     private String dueDate;
 
     @XmlElementWrapper(name = "loanedBooks")
-    @XmlElement(name = "Book")
+    @XmlElement(name = "book")
     private List<Book> loanedBooks;
 
-    @XmlElement
+    @XmlElement(name = "librarianId")
     private Integer librarianId;
 }
 

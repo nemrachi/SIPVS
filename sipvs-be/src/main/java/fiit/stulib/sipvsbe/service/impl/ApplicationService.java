@@ -2,6 +2,7 @@ package fiit.stulib.sipvsbe.service.impl;
 
 import fiit.stulib.sipvsbe.service.IApplicationService;
 import fiit.stulib.sipvsbe.service.model.LibraryLoan;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.xml.sax.SAXException;
 
@@ -21,6 +22,7 @@ import javax.xml.validation.Validator;
 import java.io.File;
 import java.io.IOException;
 
+@Slf4j
 @Service
 public class ApplicationService implements IApplicationService {
 
@@ -42,6 +44,7 @@ public class ApplicationService implements IApplicationService {
 
             System.out.println("LibraryLoan object saved to library_loan.xml");
         } catch (JAXBException e) {
+            System.out.println(e.getMessage());
             throw new RuntimeException(e.getMessage());
         }
     }

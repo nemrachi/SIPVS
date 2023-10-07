@@ -6,26 +6,26 @@ import javax.xml.bind.annotation.*;
 import java.util.List;
 
 @Data
-@XmlRootElement(name = "LibraryLoan")
+@XmlRootElement
 @XmlAccessorType(XmlAccessType.FIELD)
 public class LibraryLoan {
 
-    @XmlElement(name = "loanId")
+    @XmlAttribute(name = "loan_id")
     private String loanId;
+
+    @XmlElement
+    private Integer librarianId;
 
     private Borrower borrower;
 
-    @XmlElement(name = "dateOfLoan")
+    @XmlElement
     private String dateOfLoan;
 
-    @XmlElement(name = "dueDate")
+    @XmlElement
     private String dueDate;
 
-    @XmlElementWrapper(name = "loanedBooks")
+    @XmlElementWrapper(name = "borrowedBooks")
     @XmlElement(name = "book")
     private List<Book> loanedBooks;
-
-    @XmlElement(name = "librarianId")
-    private Integer librarianId;
 }
 

@@ -1,5 +1,57 @@
 # SIPVS project
 
+## Endpoints
+
+POST: http://localhost:8080/api/zadanie1/save
+
+Example input:
+```
+{
+  "loanId": "L000002",
+  "librarianId": 2,
+  "borrower": {
+    "cardNumber": "Borrower2"
+  },
+  "dateOfLoan": "2023-10-05",
+  "dueDate": "2023-11-05",
+  "loanedBooks": [
+    {
+      "isbn": "9780451524935"
+    },
+    {
+      "isbn": "9780486282114"
+    }
+  ]
+}
+```
+Example output:
+```
+
+```
+---
+GET: http://localhost:8080/api/zadanie1/validate
+
+Example input:
+```
+
+```
+Example output:
+```
+výstup validácie zobrazí aj s detailom prípadnej chyby
+```
+---
+GET: http://localhost:8080/api/zadanie1/transform
+
+Example input:
+```
+
+```
+Example output:
+```
+
+```
+---
+
 ### BE
 Java 8
 
@@ -15,7 +67,7 @@ Spring Boot
     - [x] aspoň 3 dátové typy (`int, string, date`)
     - [x] opakujúca sa sekcia (`borrowedBooks`)
     - [x] aspoň 1 atribút (`loan_id`)
-    - [x] vymyslieť menný priestor - targetNamespace (`http://www.library.com/loan`)
+    - [x] vymyslieť menný priestor - targetNamespace (`http://library.com/loan`)
     - !!!nekomplikovať!!!
 - návrh XSL
     - [x] do HTML

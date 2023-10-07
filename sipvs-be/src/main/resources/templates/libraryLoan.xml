@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<libraryLoan loan_id="L000001" xmlns="http://www.library.com/loan">
+<libraryLoan loan_id="L000001">
     <librarianId>1</librarianId>
     <borrower>
         <cardNumber>AB12345</cardNumber>

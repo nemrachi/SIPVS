@@ -1,10 +1,11 @@
 package fiit.stulib.sipvsbe.controller.dto;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
 
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
-import java.time.Instant;
+import java.time.LocalDate;
 import java.util.List;
 
 @Data
@@ -21,10 +22,12 @@ public class LibraryLoanDto {
     private BorrowerDto borrower;
 
     @NotNull
-    private Instant dateOfLoan;
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern="yyyy-MM-dd")
+    private LocalDate dateOfLoan;
 
     @NotNull
-    private Instant dueDate;
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern="yyyy-MM-dd")
+    private LocalDate dueDate;
 
     @NotNull
     private List<BookDto> loanedBooks;

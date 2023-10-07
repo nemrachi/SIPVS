@@ -26,13 +26,13 @@ public class ApplicationResource implements IApplicationResource {
         applicationService.save(ObjMapper.fromDto(libraryLoanDto));
     }
 
-    @GetMapping(path = "/validate", produces = "application/json", consumes = "application/json")
+    @GetMapping(path = "/validate", produces = "application/json")
     @Override
     public void validate() {
         applicationService.validate();
     }
 
-    @GetMapping(path = "/transform", produces = "application/json", consumes = "application/json")
+    @GetMapping(path = "/transform", produces = "application/json")
     @Override
     public void transform() {
         applicationService.transform();

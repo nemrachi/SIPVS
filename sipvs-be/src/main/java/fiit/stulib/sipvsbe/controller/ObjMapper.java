@@ -18,11 +18,11 @@ public class ObjMapper {
         }
         LibraryLoan obj = new LibraryLoan();
         obj.setLoanId(dto.getLoanId());
-        obj.setBorrower(ObjMapper.fromDto(dto.getBorrower()));
-        obj.setLoanedBooks(ObjMapper.fromListDto(dto.getLoanedBooks()));
         obj.setLibrarianId(dto.getLibrarianId());
+        obj.setBorrower(ObjMapper.fromDto(dto.getBorrower()));
         obj.setDueDate(dto.getDueDate().toString());
         obj.setDateOfLoan(dto.getDateOfLoan().toString());
+        obj.setLoanedBooks(ObjMapper.fromListDto(dto.getLoanedBooks()));
         return obj;
     }
 

@@ -5,7 +5,7 @@ import lombok.Data;
 import javax.xml.bind.annotation.XmlRootElement;
 
 @Data
-@XmlRootElement(name = "Borrower")
+@XmlRootElement
 public class Borrower {
 
     private String cardNumber;

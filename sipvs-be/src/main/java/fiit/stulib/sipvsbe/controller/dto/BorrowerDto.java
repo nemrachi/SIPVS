@@ -9,6 +9,6 @@ import javax.validation.constraints.Size;
 public class BorrowerDto {
 
     @NotNull
-    @Size(max = 7)
+    @Size(min = 7, max = 7)
     private String cardNumber;
 }

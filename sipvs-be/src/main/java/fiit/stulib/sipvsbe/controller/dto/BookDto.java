@@ -9,7 +9,7 @@ import javax.validation.constraints.Size;
 public class BookDto {
 
     @NotNull
-    @Size(max = 13)
+    @Size(min = 10, max = 13)
     private String isbn;
 
 }

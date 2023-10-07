@@ -28,6 +28,15 @@ Example output:
 ```
 
 ```
+Example error output:
+```
+{
+    "timestamp": "2023-10-07T20:49:11.968+00:00",
+    "status": 400,
+    "error": "Bad Request",
+    "path": "/api/zadanie1/save"
+}
+```
 ---
 GET: http://localhost:8080/api/zadanie1/validate
 
@@ -37,7 +46,11 @@ Example input:
 ```
 Example output:
 ```
-výstup validácie zobrazí aj s detailom prípadnej chyby
+? výstup validácie zobrazí aj s detailom prípadnej chyby
+```
+Example error output:
+```
+?
 ```
 ---
 GET: http://localhost:8080/api/zadanie1/transform
@@ -49,6 +62,10 @@ Example input:
 Example output:
 ```
 
+```
+Example error output:
+```
+?
 ```
 ---
 
@@ -79,7 +96,7 @@ Spring Boot
     - [ ] aplikuje spomenuté výhody elektronizácie
         - kontrola, komfort, dopočítavanie, predvypĺňanie, ....
     - aplikácia bude mať 3 tlačidlá (`BE endpoints`)
-        - [ ] Ulož XML
+        - [x] Ulož XML
             - uloží vytvorené xml do súboru
         - [ ] Over XML voči XSD
             - overí uložené xml voči vytvorenému xsd

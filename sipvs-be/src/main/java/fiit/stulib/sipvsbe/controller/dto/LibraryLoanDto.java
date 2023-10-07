@@ -12,7 +12,7 @@ import java.util.List;
 public class LibraryLoanDto {
 
     @NotNull
-    @Size(max = 7)
+    @Size(min = 7, max = 7)
     private String loanId;
 
     @NotNull

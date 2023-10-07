@@ -40,7 +40,6 @@ public class ApplicationService implements IApplicationService {
 
             // Marshal the LibraryLoan object to an XML file
             marshaller.marshal(libraryLoan, new File("src/main/resources/out/result.xml"));
-            // TODO: toto xml by ASI tiez malo byt pred ulozenim validovane
 
             System.out.println("LibraryLoan object saved to result.xml");
         } catch (JAXBException e) {

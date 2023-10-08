@@ -10,7 +10,7 @@ Example input:
   "loanId": "L000002",
   "librarianId": 2,
   "borrower": {
-    "cardNumber": "Borrower2"
+    "cardNumber": "ABCDEFG"
   },
   "dateOfLoan": "2023-10-05",
   "dueDate": "2023-11-05",
@@ -26,46 +26,50 @@ Example input:
 ```
 Example output:
 ```
+XML file was saved.
 
+Status 200
 ```
 Example error output:
 ```
-{
-    "timestamp": "2023-10-07T20:49:11.968+00:00",
-    "status": 400,
-    "error": "Bad Request",
-    "path": "/api/zadanie1/save"
-}
+Status 500 + error message
 ```
 ---
 GET: http://localhost:8080/api/zadanie1/validate
 
 Example input:
 ```
-
+N/A
 ```
 Example output:
 ```
-? výstup validácie zobrazí aj s detailom prípadnej chyby
+výstup validácie zobrazí aj s detailom prípadnej chyby - status 200
 ```
 Example error output:
 ```
-?
+Validation error: cvc-pattern-valid: Value 'AAABBB' is not facet-valid with respect to pattern '[A-Z0-9
+]{
+    7
+}' for type '#AnonType_cardNumber'.
+
+Status 422
 ```
 ---
 GET: http://localhost:8080/api/zadanie1/transform
 
 Example input:
 ```
-
+N/A
 ```
 Example output:
 ```
+HTML file was saved
 
+Status 200
 ```
 Example error output:
 ```
-?
+Status 500 + error message
 ```
 ---
 

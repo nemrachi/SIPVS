@@ -24,8 +24,14 @@ public class ApplicationResource implements IApplicationResource {
 
     @PostMapping(path = "/save", produces = "application/json", consumes = "application/json")
     @Override
-    public void save(LibraryLoanDto libraryLoanDto) {
-        applicationService.save(ObjMapper.fromDto(libraryLoanDto));
+    public ResponseEntity<String> save(LibraryLoanDto libraryLoanDto) {
+        try {
+            applicationService.save(ObjMapper.fromDto(libraryLoanDto));
+            return ResponseEntity.ok("XML file was saved.");
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Save error: " + e.getMessage());
+        }
     }
 
 
@@ -43,8 +49,14 @@ public class ApplicationResource implements IApplicationResource {
 
     @GetMapping(path = "/transform", produces = "application/json")
     @Override
-    public void transform() {
-        applicationService.transform();
+    public ResponseEntity<String> transform() {
+        try {
+            applicationService.transform();
+            return ResponseEntity.ok("HTML file was saved.");
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Transform error: " + e.getMessage());
+        }
     }
 
 }

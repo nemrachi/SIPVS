@@ -48,9 +48,6 @@ public class ApplicationService implements IApplicationService {
         }
     }
 
-
-    // TODO: výstup validácie zobrazí aj s detailom prípadnej chyby
-    // TODO: ERROR: Validation error: cvc-elt.1: Cannot find the declaration of element 'libraryLoan'.
     @Override
     public void validate() {
         try {
@@ -69,12 +66,13 @@ public class ApplicationService implements IApplicationService {
             System.out.println("Validation successful. XML is valid against the XSD.");
         } catch (SAXException e) {
             System.err.println("Validation error: " + e.getMessage());
+            throw new RuntimeException(e.getMessage());
         } catch (IOException e) {
             System.err.println("IO error: " + e.getMessage());
+            throw new RuntimeException(e.getMessage());
         }
     }
 
-    // TODO: transformuje uložené xml pomocou vytvorenej xsl a výstup uloží do súboru (html, malo by to vyzerat ako resources/templates/libraryLoan.html)
     @Override
     public void transform() {
         try {
@@ -96,6 +94,7 @@ public class ApplicationService implements IApplicationService {
             System.out.println("Transformation successful. HTML file created.");
         } catch (TransformerException e) {
             System.err.println("Transformation error: " + e.getMessage());
+            throw new RuntimeException(e.getMessage());
         }
     }
 

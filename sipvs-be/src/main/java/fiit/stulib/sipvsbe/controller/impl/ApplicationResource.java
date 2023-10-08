@@ -6,6 +6,8 @@ import fiit.stulib.sipvsbe.controller.dto.LibraryLoanDto;
 import fiit.stulib.sipvsbe.service.IApplicationService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -26,10 +28,17 @@ public class ApplicationResource implements IApplicationResource {
         applicationService.save(ObjMapper.fromDto(libraryLoanDto));
     }
 
+
     @GetMapping(path = "/validate", produces = "application/json")
     @Override
-    public void validate() {
-        applicationService.validate();
+    public ResponseEntity<String> validate() {
+        try {
+            applicationService.validate();
+            return ResponseEntity.ok("Validation successful. XML is valid against the XSD.");
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY)
+                    .body("Validation error: " + e.getMessage());
+        }
     }
 
     @GetMapping(path = "/transform", produces = "application/json")

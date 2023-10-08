@@ -9,9 +9,9 @@ import javax.validation.constraints.NotNull;
 
 public interface IApplicationResource {
 
-    void save(@RequestBody @Valid @NotNull LibraryLoanDto libraryLoanDto);
+    ResponseEntity<String> save(@RequestBody @Valid @NotNull LibraryLoanDto libraryLoanDto);
 
     ResponseEntity<String> validate();
 
-    void transform();
+    ResponseEntity<String> transform();
 }

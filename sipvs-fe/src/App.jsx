@@ -24,26 +24,26 @@ function App() {
         }
 
         try {
-            const response = await axios.post('/api/zadanie1/save', data, {
-                responseType: 'blob'
-            });
+            const response = await axios.post('/api/zadanie1/save', loan);
+            alert(response.data)
             console.log("Save endpoint response", response)
-            setStatus("Downloaded");
 
-            // Create a temporary URL for the blob
-            const blob = new Blob([response.data], {type: response.headers['content-type']});
-            const url = window.URL.createObjectURL(blob);
-
-            // Create a link element to trigger the download
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = 'returned_file.txt'; // Set the desired file name and extension
-
-            // Trigger a click event on the link to start the download
-            a.click();
-
-            // Trigger a click event on the link to start the download
-            window.URL.revokeObjectURL(url);
+            // UNCOMMENT TO DOWNLOAD FILE
+            //
+            // // Create a temporary URL for the blob
+            // const blob = new Blob([response.data], {type: response.headers['content-type']});
+            // const url = window.URL.createObjectURL(blob);
+            //
+            // // Create a link element to trigger the download
+            // const a = document.createElement('a');
+            // a.href = url;
+            // a.download = 'returned_file.txt'; // Set the desired file name and extension
+            //
+            // // Trigger a click event on the link to start the download
+            // a.click();
+            //
+            // // Trigger a click event on the link to start the download
+            // window.URL.revokeObjectURL(url);
         } catch (error) {
             console.error('Error fetching data:', error);
         }

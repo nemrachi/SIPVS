@@ -6,7 +6,7 @@ function App() {
 
     const EMPTY_LOAN = {
         loanId: "",
-        librarianId: "",
+        librarianId: 0,
         borrower: {
             cardNumber: ""
         },
@@ -70,10 +70,37 @@ function App() {
         const tempBooks = [...loan.loanedBooks];
         tempBooks.splice(index, 1)
         setLoan({...loan, loanedBooks: tempBooks})
+    }
 
+    function switchDate(timestamp) {
+        // Create a new Date object
+        let date = new Date(timestamp);
+
+        // Change the date
+        date.setMonth(3); // Months are 0-based in JavaScript, so April is 3
+        date.setDate(10);
+
+        // Format the date
+        let year = date.getFullYear();
+        let month = ("0" + (date.getMonth() + 1)).slice(-2); // Add leading 0 if necessary
+        let day = ("0" + date.getDate()).slice(-2); // Add leading 0 if necessary
+
+        // New timestamp
+        let newTimestamp = `${year}-${month}-${day}`;
+
+        return newTimestamp;
     }
 
     const handleSubmit = (e) => {
+        const dateOfLean = switchDate(loan.dateOfLoan)
+        const dueDate =  switchDate(loan.dueDate)
+
+        if (dueDate < dateOfLean) {
+            alert("Date of lean cannot be later than due date.")
+            return
+        }
+
+
         e.preventDefault();
         confirmData().then(() => {
             resetLoan()
@@ -83,10 +110,17 @@ function App() {
 
     const confirmData = async () => {
         try {
+
+            const data_to_send = loan
+            data_to_send.dateOfLoan = switchDate(loan.dateOfLoan)
+            data_to_send.dueDate = switchDate(loan.dueDate)
+            data_to_send.librarianId = parseInt(loan.librarianId)
+            data_to_send.loanedBooks = loan.loanedBooks.map(item => {
+                return { "isbn": item };
+            })
+
             const response = await axios.post('/api/zadanie1/save', loan);
             alert(response.data)
-            console.log("Save endpoint response", response)
-
             // UNCOMMENT TO DOWNLOAD FILE
             //
             // // Create a temporary URL for the blob
@@ -104,7 +138,7 @@ function App() {
             // // Trigger a click event on the link to start the download
             // window.URL.revokeObjectURL(url);
         } catch (error) {
-            alert(error.response.data)
+            alert(error.error.data)
         }
     };
     const validateData = async () => {

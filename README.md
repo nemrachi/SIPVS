@@ -88,7 +88,19 @@ Java 8
 Spring Boot
 
 ### FE
-?
+
+React
+
+Axios 
+
+
+How to run FE
+
+```
+cd sipvs-fe
+npm install
+npm run dev
+```
 
 ---
 # 1.zadanie
@@ -106,16 +118,16 @@ Spring Boot
 - implementácia web aplikácie (`FE`)
     - slúži na zber údajov – vyplnenie formulára
     - zohľadňuje pravidlá v XSD (`validacia na FE pri vyplnani`)
-    - [ ] aplikuje spomenuté výhody elektronizácie
+    - [X] aplikuje spomenuté výhody elektronizácie
         - kontrola, komfort, dopočítavanie, predvypĺňanie, ....
     - aplikácia bude mať 3 tlačidlá (`BE endpoints`)
         - [x] Ulož XML
             - uloží vytvorené xml do súboru
-        - [ ] Over XML voči XSD
+        - [X] Over XML voči XSD
             - overí uložené xml voči vytvorenému xsd
             - na overenie použije nástroje a triedy jazyka/prostredia
             - výstup validácie zobrazí aj s detailom prípadnej chyby
-        - [ ] Transformuj XML do HTML
+        - [X] Transformuj XML do HTML
             - transformuje uložené xml pomocou vytvorenej xsl
             - na transformáciu použije nástroje a triedy jazyka/prostredia
             - výstup uloží do súboru

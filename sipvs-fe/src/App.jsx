@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, {useState} from 'react';
 import axios from 'axios';
 
 function App() {
@@ -6,7 +6,23 @@ function App() {
 
     const fetchData = async () => {
         try {
-            const response = await axios.get('https://jsonplaceholder.typicode.com/todos/1'); // Replace with your API endpoint
+            const response = await axios.post('/api/zadanie1/save', {
+                "loanId": "L000002",
+                "librarianId": 2,
+                "borrower": {
+                    "cardNumber": "ABCDEFG"
+                },
+                "dateOfLoan": "2023-10-05",
+                "dueDate": "2023-11-05",
+                "loanedBooks": [
+                    {
+                        "isbn": "9780451524935"
+                    },
+                    {
+                        "isbn": "9780486282114"
+                    }
+                ]
+            });
             setData(response.data);
         } catch (error) {
             console.error('Error fetching data:', error);

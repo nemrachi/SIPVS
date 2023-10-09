@@ -26,8 +26,7 @@ public class ApplicationResource implements IApplicationResource {
     @Override
     public ResponseEntity<String> save(LibraryLoanDto libraryLoanDto) {
         try {
-            applicationService.save(ObjMapper.fromDto(libraryLoanDto));
-            return ResponseEntity.ok("XML file was saved.");
+            return ResponseEntity.ok(applicationService.save(ObjMapper.fromDto(libraryLoanDto)));
         } catch (RuntimeException e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body("Save error: " + e.getMessage());

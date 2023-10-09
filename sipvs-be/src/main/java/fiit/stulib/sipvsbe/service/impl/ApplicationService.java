@@ -5,6 +5,7 @@ import fiit.stulib.sipvsbe.service.model.LibraryLoan;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.xml.sax.SAXException;
+import java.nio.file.Files;
 
 import javax.xml.XMLConstants;
 import javax.xml.bind.JAXBContext;
@@ -27,7 +28,7 @@ import java.io.IOException;
 public class ApplicationService implements IApplicationService {
 
     @Override
-    public void save(LibraryLoan libraryLoan) {
+    public String save(LibraryLoan libraryLoan) {
         try {
             // Create a JAXB context for the LibraryLoan class
             JAXBContext context = JAXBContext.newInstance(LibraryLoan.class);
@@ -39,10 +40,15 @@ public class ApplicationService implements IApplicationService {
             marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
 
             // Marshal the LibraryLoan object to an XML file
-            marshaller.marshal(libraryLoan, new File("src/main/resources/out/result.xml"));
+            File outputFile = new File("src/main/resources/out/result.xml");
+            marshaller.marshal(libraryLoan, outputFile);
 
             System.out.println("LibraryLoan object saved to result.xml");
-        } catch (JAXBException e) {
+
+            // Read the saved XML content from the file
+            return new String(Files.readAllBytes(outputFile.toPath()));
+
+        } catch (JAXBException | IOException e) {
             System.out.println(e.getMessage());
             throw new RuntimeException(e.getMessage());
         }

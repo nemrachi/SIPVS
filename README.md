@@ -2,7 +2,7 @@
 
 ## Endpoints
 
-POST: http://localhost:8080/api/zadanie1/save
+## POST: http://localhost:8080/api/zadanie1/save
 
 Example input:
 ```
@@ -34,8 +34,17 @@ Example error output:
 ```
 Status 500 + error message
 ```
----
-GET: http://localhost:8080/api/zadanie1/validate
+Data correct format:
+| Element | Format | Example |
+|---|---|---|
+| loan_id | [A-Z][0-9]{6} | A123456 |
+| librarianId | integer | 1 |
+| dateOfLoan | yyyy-MM-dd | 2023-01-01 |
+| dueDate | yyyy-MM-dd | 2023-01-01 |
+| cardNumber | [A-Z0-9]{7} | ABC1DEF |
+| isbn | [0-9]{10} \| [0-9]{13} | 0123456789, 0123456789012 |
+
+## GET: http://localhost:8080/api/zadanie1/validate
 
 Example input:
 ```
@@ -54,8 +63,8 @@ Validation error: cvc-pattern-valid: Value 'AAABBB' is not facet-valid with resp
 
 Status 422
 ```
----
-GET: http://localhost:8080/api/zadanie1/transform
+
+## GET: http://localhost:8080/api/zadanie1/transform
 
 Example input:
 ```

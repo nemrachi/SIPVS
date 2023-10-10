@@ -92,10 +92,7 @@ function App() {
     }
 
     const handleSubmit = (e) => {
-        const dateOfLean = switchDate(loan.dateOfLoan)
-        const dueDate =  switchDate(loan.dueDate)
-
-        if (dueDate < dateOfLean) {
+        if (new Date(loan.dueDate) < new Date(loan.dateOfLoan)) {
             alert("Date of lean cannot be later than due date.")
             return
         }
@@ -205,6 +202,13 @@ function App() {
                         <td><input required type="date" name="dueDate" value={loan.dueDate} onChange={handleChange}
                                    placeholder="2023-05-01"/></td>
                     </tr>
+                    { (loan.dueDate!== "" && loan.dateOfLoan !== "") && loan.dueDate < loan.dateOfLoan &&
+                        <tr>
+                            <td></td>
+                        <td style={{color: "red"}}> Date of lean cannot be later than due date.</td>
+                        </tr>
+                    }
+
                     <tr>
                         <td>
                             <h3>Knihy</h3>

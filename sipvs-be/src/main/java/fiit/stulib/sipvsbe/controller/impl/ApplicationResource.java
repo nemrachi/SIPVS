@@ -26,6 +26,9 @@ public class ApplicationResource implements IApplicationResource {
     @Override
     public ResponseEntity<String> save(LibraryLoanDto libraryLoanDto) {
         try {
+            if (libraryLoanDto.getDateOfLoan().isAfter(libraryLoanDto.getDueDate())) {
+                throw new IllegalArgumentException("Date Of Loan cannot be after Due Date.");
+            }
             applicationService.save(ObjMapper.fromDto(libraryLoanDto));
             return ResponseEntity.ok("XML file was saved.");
         } catch (RuntimeException e) {

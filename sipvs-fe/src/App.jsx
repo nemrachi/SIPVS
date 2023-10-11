@@ -211,7 +211,7 @@ function App() {
 
                     <tr>
                         <td>
-                            <h3>Knihy</h3>
+                            <h3>Books</h3>
                         </td>
                     </tr>
                     {loan.loanedBooks.map((book, index) => {

@@ -18,7 +18,7 @@
                             border-radius: 7px;
                             box-shadow: 1px 7px 13px 7px lightgrey;
                             ">
-                    <h1>Vypozicka</h1>
+                    <h1>Loan a book</h1>
                     <table>
                         <tr><td>Loan ID</td><td><input type="text" disabled="disabled">
                             <xsl:attribute name="value"><xsl:value-of select="@loan_id" /></xsl:attribute>
@@ -35,7 +35,7 @@
                         <tr><td>Due Date</td><td><input type="date" disabled="disabled">
                             <xsl:attribute name="value"><xsl:value-of select="l:dueDate" /></xsl:attribute>
                         </input></td></tr>
-                        <tr><td><h3>Knihy</h3></td></tr>
+                        <tr><td><h3>Books</h3></td></tr>
                         <xsl:for-each select="l:borrowedBooks/l:book">
                             <tr><td>ISBN</td><td><input type="text" disabled="disabled">
                                 <xsl:attribute name="value"><xsl:value-of select="l:isbn" /></xsl:attribute>

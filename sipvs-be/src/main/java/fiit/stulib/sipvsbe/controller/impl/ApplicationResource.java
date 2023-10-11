@@ -4,6 +4,7 @@ import fiit.stulib.sipvsbe.controller.IApplicationResource;
 import fiit.stulib.sipvsbe.controller.ObjMapper;
 import fiit.stulib.sipvsbe.controller.dto.LibraryLoanDto;
 import fiit.stulib.sipvsbe.service.IApplicationService;
+import fiit.stulib.sipvsbe.service.IValidationService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -21,22 +22,20 @@ public class ApplicationResource implements IApplicationResource {
 
     @Autowired
     private IApplicationService applicationService;
+    @Autowired
+    private IValidationService validationService;
 
-    @PostMapping(path = "/save", produces = "application/json", consumes = "application/json")
+    @PostMapping(path = "/save", produces = "application/xml", consumes = "application/json")
     @Override
     public ResponseEntity<String> save(LibraryLoanDto libraryLoanDto) {
         try {
-            if (libraryLoanDto.getDateOfLoan().isAfter(libraryLoanDto.getDueDate())) {
-                throw new IllegalArgumentException("Date Of Loan cannot be after Due Date.");
-            }
-            applicationService.save(ObjMapper.fromDto(libraryLoanDto));
-            return ResponseEntity.ok("XML file was saved.");
+            validationService.validateLibraryLoan(libraryLoanDto);
+            return ResponseEntity.ok(applicationService.save(ObjMapper.fromDto(libraryLoanDto)));
         } catch (RuntimeException e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body("Save error: " + e.getMessage());
         }
     }
-
 
     @GetMapping(path = "/validate", produces = "application/json")
     @Override

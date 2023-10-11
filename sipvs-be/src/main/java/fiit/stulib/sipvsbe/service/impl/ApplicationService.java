@@ -19,16 +19,17 @@ import javax.xml.transform.stream.StreamSource;
 import javax.xml.validation.Schema;
 import javax.xml.validation.SchemaFactory;
 import javax.xml.validation.Validator;
-import java.io.File;
-import java.io.IOException;
+import java.io.*;
 
 @Slf4j
 @Service
 public class ApplicationService implements IApplicationService {
 
     @Override
-    public void save(LibraryLoan libraryLoan) {
+    public String save(LibraryLoan libraryLoan) {
         try {
+            StringWriter xml = new StringWriter();
+
             // Create a JAXB context for the LibraryLoan class
             JAXBContext context = JAXBContext.newInstance(LibraryLoan.class);
 
@@ -39,10 +40,15 @@ public class ApplicationService implements IApplicationService {
             marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
 
             // Marshal the LibraryLoan object to an XML file
-            marshaller.marshal(libraryLoan, new File("src/main/resources/out/result.xml"));
+            marshaller.marshal(libraryLoan, xml);
 
-            System.out.println("LibraryLoan object saved to result.xml");
-        } catch (JAXBException e) {
+            try (PrintWriter out = new PrintWriter("src/main/resources/out/result.xml")) {
+                out.println(xml);
+                System.out.println("LibraryLoan object saved to result.xml");
+            }
+
+            return xml.toString();
+        } catch (JAXBException | FileNotFoundException e) {
             System.out.println(e.getMessage());
             throw new RuntimeException(e.getMessage());
         }

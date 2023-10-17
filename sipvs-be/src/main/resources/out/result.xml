@@ -2,7 +2,7 @@
 <libraryLoan xmlns="http://library.com/loan" loan_id="L000002">
     <librarianId>2</librarianId>
     <borrower>
-        <cardNumber>ABCDEFG</cardNumber>
+        <cardNumber>AAABBBC</cardNumber>
     </borrower>
     <dateOfLoan>2023-10-05</dateOfLoan>
     <dueDate>2023-11-05</dueDate>

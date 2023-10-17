@@ -158,6 +158,10 @@ function App() {
         }
     };
 
+    const signData = async () => {
+        // TODO
+    };
+
     return (
         <main className="">
             <form className="" onSubmit={handleSubmit} style={{
@@ -254,6 +258,9 @@ function App() {
                 </button>
                 <button type="button" onClick={() => transformData()}>
                     Transform data
+                </button>
+                <button type="button" onClick={() => signData()}>
+                    Sign
                 </button>
                 {wizard && <button type="button"
                                    onClick={() => alert("Crying... 😓🥺😭😭")}>

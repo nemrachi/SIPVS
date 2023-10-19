@@ -1,0 +1,4 @@
+specifikacia XMLSignature je na:
+
+http://www.w3.org/TR/xmldsig-core/
+

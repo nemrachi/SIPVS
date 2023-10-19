@@ -1,5 +1,6 @@
 import React, {useState} from 'react';
 import axios from 'axios';
+import SignComponent from './SignComponent';
 
 function App() {
     const [wizard, setWizard] = useState(false);
@@ -158,6 +159,16 @@ function App() {
         }
     };
 
+    const signData = async () => {
+        try {
+            const response = await axios.get('/api/zadanie1/sign');
+            alert(response.data)
+
+        } catch (error) {
+            alert(error.response.data)
+        }
+    };
+
     return (
         <main className="">
             <form className="" onSubmit={handleSubmit} style={{
@@ -254,6 +265,9 @@ function App() {
                 </button>
                 <button type="button" onClick={() => transformData()}>
                     Transform data
+                </button>
+                <button type="button" onClick={() => SignComponent()}>
+                    Sign data
                 </button>
                 {wizard && <button type="button"
                                    onClick={() => alert("Crying... 😓🥺😭😭")}>

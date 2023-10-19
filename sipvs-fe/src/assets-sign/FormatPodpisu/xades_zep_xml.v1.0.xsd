@@ -1,0 +1,68 @@
+<?xml version="1.0"?>
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+xmlns:ds="http://www.w3.org/2000/09/xmldsig#"
+xmlns="http://www.ditec.sk/ep/signature_formats/xades_zep_xml/v1.0"
+targetNamespace="http://www.ditec.sk/ep/signature_formats/xades_zep_xml/v1.0">
+
+<xsd:import 
+	namespace = "http://www.w3.org/2000/09/xmldsig#" 
+	schemaLocation = "http://www.w3.org/TR/2002/REC-xmldsig-core-20020212/xmldsig-core-schema.xsd"
+/>
+
+<xsd:element name = "XMLVerificationDataReferences">
+	<xsd:complexType>
+		<xsd:sequence>
+			<xsd:element ref = "SchemaReference"/>
+			<xsd:element ref = "VisualTransformReference"/>
+		</xsd:sequence>
+		<xsd:attribute name="DataTarget" type="xsd:anyURI"
+			use="required"/>
+	</xsd:complexType>
+</xsd:element>
+
+<xsd:element name = "SchemaReference">
+	<xsd:complexType>
+		<xsd:sequence>
+			<xsd:element ref = "ds:Reference"/>
+		</xsd:sequence>
+	</xsd:complexType>
+</xsd:element>
+
+<xsd:element name = "VisualTransformReference">
+	<xsd:complexType>
+		<xsd:sequence>
+			<xsd:element ref = "ds:Reference"/>
+		</xsd:sequence>
+	</xsd:complexType>
+</xsd:element>
+
+<xsd:element name = "XMLVerificationDataValues">
+	<xsd:complexType>
+		<xsd:sequence>
+			<xsd:element ref = "SchemaValue"/>
+			<xsd:element ref = "VisualTransformValue"/>
+		</xsd:sequence>
+	</xsd:complexType>
+</xsd:element>
+
+<xsd:element name = "SchemaValue">
+	<xsd:complexType>
+		<xsd:simpleContent>
+			<xsd:extension base="xsd:string">
+				<xsd:attribute name="URI" type="xsd:anyURI" use="required"/>
+			</xsd:extension>
+		</xsd:simpleContent>
+	</xsd:complexType>
+</xsd:element>
+
+<xsd:element name = "VisualTransformValue">
+	<xsd:complexType>
+		<xsd:simpleContent>
+			<xsd:extension base="xsd:string">
+				<xsd:attribute name="URI" type="xsd:anyURI" use="required"/>
+			</xsd:extension>
+		</xsd:simpleContent>
+	</xsd:complexType>
+</xsd:element>
+
+</xsd:schema>

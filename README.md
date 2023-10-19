@@ -26,8 +26,9 @@ Example input:
 ```
 Example output:
 ```
-XML file was saved.
-
+XML string.
+```
+```
 Status 200
 ```
 Example error output:
@@ -89,21 +90,36 @@ Transformation error: error message
 ```
 Status 500
 ```
+
+## GET: http://localhost:8080/api/zadanie1/sign
+
+Example input:
+```
+?
+```
+Example output:
+```
+?
+```
+```
+Status 200
+```
+Example error output:
+```
+Sign error: error message
+```
+```
+Status 500
+```
+
 ---
-
 ### BE
-Java 8
-
-Spring Boot
+Java 8, Spring Boot
 
 ### FE
+React, Axios 
 
-React
-
-Axios 
-
-
-How to run FE
+#### How to run FE
 
 ```
 cd sipvs-fe
@@ -111,40 +127,17 @@ npm install
 npm run dev
 ```
 
----
-# 1.zadanie
-- tvorba formulára – každá skupina si zvolí sama
-- návrh XSD
-    - [x] aspoň 3 dátové typy (`int, string, date`)
-    - [x] opakujúca sa sekcia (`borrowedBooks`)
-    - [x] aspoň 1 atribút (`loan_id`)
-    - [x] vymyslieť menný priestor - targetNamespace (`http://library.com/loan`)
-    - !!!nekomplikovať!!!
-- návrh XSL
-    - [x] do HTML
-    - [ ] ? ~~ak je z reálneho sveta, zabezpečiť maximálnu podobu s papierom~~ ?
-    - [x] readonly bez aktívnych prvkov
-- implementácia web aplikácie (`FE`)
-    - slúži na zber údajov – vyplnenie formulára
-    - zohľadňuje pravidlá v XSD (`validacia na FE pri vyplnani`)
-    - [X] aplikuje spomenuté výhody elektronizácie
-        - kontrola, komfort, dopočítavanie, predvypĺňanie, ....
-    - aplikácia bude mať 3 tlačidlá (`BE endpoints`)
-        - [x] Ulož XML
-            - uloží vytvorené xml do súboru
-        - [X] Over XML voči XSD
-            - overí uložené xml voči vytvorenému xsd
-            - na overenie použije nástroje a triedy jazyka/prostredia
-            - výstup validácie zobrazí aj s detailom prípadnej chyby
-        - [X] Transformuj XML do HTML
-            - transformuje uložené xml pomocou vytvorenej xsl
-            - na transformáciu použije nástroje a triedy jazyka/prostredia
-            - výstup uloží do súboru
+## Podpisovac navod
+
+- stiahnut a nainstalovat D.Lanucher v2.x
+  - pozriet si systemove poziadavky k prislusnemu operacnemu systemu
+- pridat plugin D.Bridge 2 do prehliadaca
+- ? ako to spojazdnit ?
 
 ---
 # 2.zadanie
 - nové tlačidlo
-  - [ ] pridať nové tlačidlo na existujúci formulár s názvom “Podpísať”
+  - [x] pridať nové tlačidlo na existujúci formulár s názvom “Podpísať”
   - [ ] zavolať podpisovač a jedným podpisom podpísať
     - objekt xml dáta s xsd a xslt
     - objekt pdf

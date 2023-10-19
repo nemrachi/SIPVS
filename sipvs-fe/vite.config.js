@@ -11,6 +11,11 @@ export default defineConfig({
         changeOrigin: true,
         rewrite: (path) => path.replace(/^\/api/, ''),
       },
-    },
+      // maybe for testing of their service
+      '/posts': {
+        target: "http://test.ditec.sk/",
+        secure: true,
+        rewrite: (path) => path.replace(/^\/posts/, ''),
+      },
   },
 })

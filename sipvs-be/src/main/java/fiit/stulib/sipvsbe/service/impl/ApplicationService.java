@@ -20,16 +20,21 @@ import javax.xml.validation.Schema;
 import javax.xml.validation.SchemaFactory;
 import javax.xml.validation.Validator;
 import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 
 @Slf4j
 @Service
 public class ApplicationService implements IApplicationService {
 
-    @Override
-    public String save(LibraryLoan libraryLoan) {
-        try {
-            StringWriter xml = new StringWriter();
+    private final String XML = "src/main/resources/out/result.xml";
+    private final String XSD = "src/main/resources/templates/libraryLoan.xsd";
+    private final String XSL = "src/main/resources/templates/libraryLoan.xsl";
+    private final String HTML = "src/main/resources/out/result.html";
 
+    @Override
+    public void save(LibraryLoan libraryLoan) {
+        try {
             // Create a JAXB context for the LibraryLoan class
             JAXBContext context = JAXBContext.newInstance(LibraryLoan.class);
 
@@ -40,15 +45,10 @@ public class ApplicationService implements IApplicationService {
             marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
 
             // Marshal the LibraryLoan object to an XML file
-            marshaller.marshal(libraryLoan, xml);
+            marshaller.marshal(libraryLoan, new File(XML));
 
-            try (PrintWriter out = new PrintWriter("src/main/resources/out/result.xml")) {
-                out.println(xml);
-                System.out.println("LibraryLoan object saved to result.xml");
-            }
-
-            return xml.toString();
-        } catch (JAXBException | FileNotFoundException e) {
+            System.out.println("LibraryLoan object saved to result.xml");
+        } catch (JAXBException e) {
             System.out.println(e.getMessage());
             throw new RuntimeException(e.getMessage());
         }
@@ -61,13 +61,13 @@ public class ApplicationService implements IApplicationService {
             SchemaFactory factory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
 
             // Load the XSD schema from a file (replace with your XSD file)
-            Schema schema = factory.newSchema(new File("src/main/resources/templates/libraryLoan.xsd"));
+            Schema schema = factory.newSchema(new File(XSD));
 
             // Create a Validator from the schema
             Validator validator = schema.newValidator();
 
             // Validate the XML file (replace with your XML file)
-            validator.validate(new StreamSource(new File("src/main/resources/out/result.xml")));
+            validator.validate(new StreamSource(new File(XML)));
 
             System.out.println("Validation successful. XML is valid against the XSD.");
         } catch (SAXException e) {
@@ -86,16 +86,16 @@ public class ApplicationService implements IApplicationService {
             TransformerFactory transformerFactory = TransformerFactory.newInstance();
 
             // Load the XSLT stylesheet (replace with your XSLT file)
-            Source xslt = new StreamSource(new File("src/main/resources/templates/libraryLoan.xsl"));
+            Source xslt = new StreamSource(new File(XSL));
 
             // Create a Transformer with the XSLT stylesheet
             Transformer transformer = transformerFactory.newTransformer(xslt);
 
             // Load the input XML file (replace with your XML file)
-            Source xmlInput = new StreamSource(new File("src/main/resources/out/result.xml"));
+            Source xmlInput = new StreamSource(new File(XML));
 
             // Perform the transformation and save the result to an HTML file
-            transformer.transform(xmlInput, new StreamResult(new File("src/main/resources/out/result.html")));
+            transformer.transform(xmlInput, new StreamResult(new File(HTML)));
 
             System.out.println("Transformation successful. HTML file created.");
         } catch (TransformerException e) {
@@ -104,5 +104,15 @@ public class ApplicationService implements IApplicationService {
         }
     }
 
-
+    @Override
+    public String sign() {
+        try {
+            return new String(Files.readAllBytes(Paths.get(XML)));
+        } catch (IOException e) {
+            System.err.println("Sign error: " + e.getMessage());
+            throw new RuntimeException(e.getMessage());
+        } finally {
+            System.out.println("XML send for signature.");
+        }
+    }
 }

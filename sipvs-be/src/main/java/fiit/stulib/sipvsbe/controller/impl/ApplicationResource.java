@@ -25,12 +25,13 @@ public class ApplicationResource implements IApplicationResource {
     @Autowired
     private IValidationService validationService;
 
-    @PostMapping(path = "/save", produces = "application/xml", consumes = "application/json")
+    @PostMapping(path = "/save", produces = "application/json", consumes = "application/json")
     @Override
     public ResponseEntity<String> save(LibraryLoanDto libraryLoanDto) {
         try {
             validationService.validateLibraryLoan(libraryLoanDto);
-            return ResponseEntity.ok(applicationService.save(ObjMapper.fromDto(libraryLoanDto)));
+            applicationService.save(ObjMapper.fromDto(libraryLoanDto));
+            return ResponseEntity.ok("XML file was saved.");
         } catch (RuntimeException e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body("Save error: " + e.getMessage());
@@ -61,4 +62,15 @@ public class ApplicationResource implements IApplicationResource {
         }
     }
 
+    // return XML that FE signs with ditec
+    @GetMapping(path = "/sign", produces = "application/xml")
+    @Override
+    public ResponseEntity<String> sign() {
+        try {
+            return ResponseEntity.ok(applicationService.sign());
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Sign error: " + e.getMessage());
+        }
+    }
 }

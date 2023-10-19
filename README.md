@@ -26,14 +26,14 @@ Example input:
 ```
 Example output:
 ```
-XML string.
+"XML file was saved."
 ```
 ```
 Status 200
 ```
 Example error output:
 ```
-Save error: error message
+"Save error: [error message]"
 ```
 ```
 Status 500
@@ -57,14 +57,14 @@ N/A
 ```
 Example output:
 ```
-Validation successful. XML is valid against the XSD.
+"Validation successful. XML is valid against the XSD."
 ```
 ```
 Status 200
 ```
 Example error output:
 ```
-Validation error: error message
+"Validation error: [error message]"
 ```
 ```
 Status 422
@@ -78,14 +78,14 @@ N/A
 ```
 Example output:
 ```
-HTML file was saved
+"HTML file was saved."
 ```
 ```
 Status 200
 ```
 Example error output:
 ```
-Transformation error: error message
+"Transformation error: [error message]"
 ```
 ```
 Status 500
@@ -95,18 +95,18 @@ Status 500
 
 Example input:
 ```
-?
+N/A
 ```
 Example output:
 ```
-?
+XML response
 ```
 ```
 Status 200
 ```
 Example error output:
 ```
-Sign error: error message
+"Sign error: [error message]"
 ```
 ```
 Status 500
@@ -120,7 +120,6 @@ Java 8, Spring Boot
 React, Axios 
 
 #### How to run FE
-
 ```
 cd sipvs-fe
 npm install
@@ -132,7 +131,7 @@ npm run dev
 - stiahnut a nainstalovat D.Lanucher v2.x
   - pozriet si systemove poziadavky k prislusnemu operacnemu systemu
 - pridat plugin D.Bridge 2 do prehliadaca
-- ? ako to spojazdnit ?
+- **? ako to spojazdnit ?**
 
 ---
 # 2.zadanie

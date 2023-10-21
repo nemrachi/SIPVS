@@ -32,7 +32,7 @@
     <xs:element name="cardNumber">
         <xs:simpleType>
             <xs:restriction base="xs:string">
-                <xs:pattern value="[A-Z0-9]{7}" />
+                <xs:pattern value="[A-Z0-9]{7}"/>
             </xs:restriction>
         </xs:simpleType>
     </xs:element>
@@ -55,7 +55,7 @@
     <xs:element name="isbn">
         <xs:simpleType>
             <xs:restriction base="xs:string">
-                <xs:pattern value="[0-9]{10}|[0-9]{13}" />
+                <xs:pattern value="[0-9]{10}|[0-9]{13}"/>
             </xs:restriction>
         </xs:simpleType>
     </xs:element>

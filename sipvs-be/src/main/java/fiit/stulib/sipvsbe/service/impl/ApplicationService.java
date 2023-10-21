@@ -82,20 +82,16 @@ public class ApplicationService implements IApplicationService {
     @Override
     public void transform() {
         try {
-            // Create a TransformerFactory
             TransformerFactory transformerFactory = TransformerFactory.newInstance();
 
-            // Load the XSLT stylesheet (replace with your XSLT file)
             Source xslt = new StreamSource(new File("src/main/resources/templates/libraryLoan.xsl"));
 
-            // Create a Transformer with the XSLT stylesheet
             Transformer transformer = transformerFactory.newTransformer(xslt);
 
-            // Load the input XML file (replace with your XML file)
             Source xmlInput = new StreamSource(new File("src/main/resources/out/result.xml"));
 
-            // Perform the transformation and save the result to an HTML file
-            transformer.transform(xmlInput, new StreamResult(new File("src/main/resources/out/result.html")));
+            StreamResult file = new StreamResult(new File("src/main/resources/out/result.html"));
+            transformer.transform(xmlInput, file);
 
             System.out.println("Transformation successful. HTML file created.");
         } catch (TransformerException e) {

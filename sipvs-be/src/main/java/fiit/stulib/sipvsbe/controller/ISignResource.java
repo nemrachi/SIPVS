@@ -7,4 +7,6 @@ public interface ISignResource {
 
     ResponseEntity<ByteArrayResource> generatePdf();
 
+    ResponseEntity<String> sign();
+
 }

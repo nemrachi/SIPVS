@@ -15,5 +15,4 @@ public interface IApplicationResource {
 
     ResponseEntity<String> transform();
 
-    ResponseEntity<String> sign();
 }

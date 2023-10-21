@@ -1,13 +1,13 @@
 package fiit.stulib.sipvsbe.service.impl;
 
 import com.openhtmltopdf.pdfboxout.PdfRendererBuilder;
+import fiit.stulib.sipvsbe.service.AppConfig;
 import fiit.stulib.sipvsbe.service.ISignService;
 import lombok.extern.slf4j.Slf4j;
 import org.jsoup.Jsoup;
 import org.jsoup.helper.W3CDom;
 import org.jsoup.nodes.Document;
 import org.springframework.stereotype.Service;
-
 
 import java.io.File;
 import java.io.IOException;
@@ -21,8 +21,7 @@ public class SignService implements ISignService {
 
     @Override
     public byte[] createPdfFromXml() {
-        String outputPdf = "src/main/resources/out/result.pdf";
-        File inputHTML = new File("src/main/resources/out/result.html");
+        File inputHTML = new File(AppConfig.HTML);
 
         Document document = null;
         try {
@@ -32,9 +31,9 @@ public class SignService implements ISignService {
         }
         document.outputSettings().syntax(Document.OutputSettings.Syntax.xml);
 
-        try (OutputStream os = Files.newOutputStream(Paths.get(outputPdf))) {
+        try (OutputStream os = Files.newOutputStream(Paths.get(AppConfig.PDF))) {
             PdfRendererBuilder builder = new PdfRendererBuilder();
-            builder.withUri(outputPdf);
+            builder.withUri(AppConfig.PDF);
             builder.toStream(os);
             builder.withW3cDocument(new W3CDom().fromJsoup(document), "/");
             builder.run();
@@ -44,4 +43,18 @@ public class SignService implements ISignService {
 
         return new byte[0];
     }
+
+    @Override
+    public String sign() {
+        try {
+            return new String(Files.readAllBytes(Paths.get(AppConfig.XML)));
+        } catch (IOException e) {
+            System.err.println("Sign error: " + e.getMessage());
+            throw new RuntimeException(e.getMessage());
+        } finally {
+            System.out.println("XML send for signature.");
+        }
+    }
+
+
 }

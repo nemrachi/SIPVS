@@ -9,6 +9,4 @@ public interface IApplicationService {
     void validate();
 
     void transform();
-
-    String sign();
 }

@@ -62,15 +62,4 @@ public class ApplicationResource implements IApplicationResource {
         }
     }
 
-    // return XML that FE signs with ditec
-    @GetMapping(path = "/sign", produces = "application/xml")
-    @Override
-    public ResponseEntity<String> sign() {
-        try {
-            return ResponseEntity.ok(applicationService.sign());
-        } catch (RuntimeException e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body("Sign error: " + e.getMessage());
-        }
-    }
 }

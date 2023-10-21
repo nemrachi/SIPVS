@@ -1,5 +1,6 @@
 package fiit.stulib.sipvsbe.service.impl;
 
+import fiit.stulib.sipvsbe.service.AppConfig;
 import fiit.stulib.sipvsbe.service.IApplicationService;
 import fiit.stulib.sipvsbe.service.model.LibraryLoan;
 import lombok.extern.slf4j.Slf4j;
@@ -19,18 +20,12 @@ import javax.xml.transform.stream.StreamSource;
 import javax.xml.validation.Schema;
 import javax.xml.validation.SchemaFactory;
 import javax.xml.validation.Validator;
-import java.io.*;
-import java.nio.file.Files;
-import java.nio.file.Paths;
+import java.io.File;
+import java.io.IOException;
 
 @Slf4j
 @Service
 public class ApplicationService implements IApplicationService {
-
-    private final String XML = "src/main/resources/out/result.xml";
-    private final String XSD = "src/main/resources/templates/libraryLoan.xsd";
-    private final String XSL = "src/main/resources/templates/libraryLoan.xsl";
-    private final String HTML = "src/main/resources/out/result.html";
 
     @Override
     public void save(LibraryLoan libraryLoan) {
@@ -45,7 +40,7 @@ public class ApplicationService implements IApplicationService {
             marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
 
             // Marshal the LibraryLoan object to an XML file
-            marshaller.marshal(libraryLoan, new File(XML));
+            marshaller.marshal(libraryLoan, new File(AppConfig.XML));
 
             System.out.println("LibraryLoan object saved to result.xml");
         } catch (JAXBException e) {
@@ -61,13 +56,13 @@ public class ApplicationService implements IApplicationService {
             SchemaFactory factory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
 
             // Load the XSD schema from a file (replace with your XSD file)
-            Schema schema = factory.newSchema(new File(XSD));
+            Schema schema = factory.newSchema(new File(AppConfig.XSD));
 
             // Create a Validator from the schema
             Validator validator = schema.newValidator();
 
             // Validate the XML file (replace with your XML file)
-            validator.validate(new StreamSource(new File(XML)));
+            validator.validate(new StreamSource(new File(AppConfig.XML)));
 
             System.out.println("Validation successful. XML is valid against the XSD.");
         } catch (SAXException e) {
@@ -86,16 +81,16 @@ public class ApplicationService implements IApplicationService {
             TransformerFactory transformerFactory = TransformerFactory.newInstance();
 
             // Load the XSLT stylesheet (replace with your XSLT file)
-            Source xslt = new StreamSource(new File(XSL));
+            Source xslt = new StreamSource(new File(AppConfig.XSL));
 
             // Create a Transformer with the XSLT stylesheet
             Transformer transformer = transformerFactory.newTransformer(xslt);
 
             // Load the input XML file (replace with your XML file)
-            Source xmlInput = new StreamSource(new File(XML));
+            Source xmlInput = new StreamSource(new File(AppConfig.XML));
 
             // Perform the transformation and save the result to an HTML file
-            transformer.transform(xmlInput, new StreamResult(new File(HTML)));
+            transformer.transform(xmlInput, new StreamResult(new File(AppConfig.HTML)));
 
             System.out.println("Transformation successful. HTML file created.");
         } catch (TransformerException e) {
@@ -104,15 +99,4 @@ public class ApplicationService implements IApplicationService {
         }
     }
 
-    @Override
-    public String sign() {
-        try {
-            return new String(Files.readAllBytes(Paths.get(XML)));
-        } catch (IOException e) {
-            System.err.println("Sign error: " + e.getMessage());
-            throw new RuntimeException(e.getMessage());
-        } finally {
-            System.out.println("XML send for signature.");
-        }
-    }
 }

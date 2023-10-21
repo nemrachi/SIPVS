@@ -6,6 +6,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -32,5 +33,17 @@ public class SignResource implements ISignResource {
                 .contentType(MediaType.APPLICATION_PDF)
                 .contentLength(pdfData.length)
                 .body(resource);
+    }
+
+    // return XML that FE signs with ditec
+    @GetMapping(path = "/sign", produces = "application/xml")
+    @Override
+    public ResponseEntity<String> sign() {
+        try {
+            return ResponseEntity.ok(signService.sign());
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Sign error: " + e.getMessage());
+        }
     }
 }

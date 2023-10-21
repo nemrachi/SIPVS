@@ -4,9 +4,11 @@ import fiit.stulib.sipvsbe.service.model.LibraryLoan;
 
 public interface IApplicationService {
 
-    String save(LibraryLoan libraryLoan);
+    void save(LibraryLoan libraryLoan);
 
     void validate();
 
     void transform();
+
+    String sign();
 }

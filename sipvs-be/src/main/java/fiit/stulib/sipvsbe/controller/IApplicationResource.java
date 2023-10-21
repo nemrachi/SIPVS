@@ -14,4 +14,6 @@ public interface IApplicationResource {
     ResponseEntity<String> validate();
 
     ResponseEntity<String> transform();
+
+    ResponseEntity<String> sign();
 }

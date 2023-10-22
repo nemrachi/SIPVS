@@ -77,10 +77,6 @@ function App() {
         // Create a new Date object
         let date = new Date(timestamp);
 
-        // Change the date
-        date.setMonth(3); // Months are 0-based in JavaScript, so April is 3
-        date.setDate(10);
-
         // Format the date
         let year = date.getFullYear();
         let month = ("0" + (date.getMonth() + 1)).slice(-2); // Add leading 0 if necessary

@@ -3,7 +3,7 @@ import React from 'react';
 /*
 * simplier ditec sign calling
 */
-function callback(succes: any, error = (e: any)=> {console.log("error: "+e)}) {
+function callback(succes, error = (e) => { console.log("error: " + e) }) {
     return {
         onSuccess: succes,
         onError: error

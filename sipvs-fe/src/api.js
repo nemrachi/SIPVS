@@ -22,12 +22,7 @@ export const transformData = async () => {
 };
 
 export const signData = async () => {
-    try {
-        const response = await axios.get('/api/zadanie1/sign');
-        alert(response.data);
-    } catch (error) {
-        alert(error.response.data);
-    }
+   await sign
 };
 
 export const confirmData = async (loan) => {

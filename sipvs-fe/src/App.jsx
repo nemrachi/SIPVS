@@ -58,6 +58,79 @@ function App() {
     }
 
 
+    // SIGN LOGIC
+
+    class Callback {
+        constructor() {
+            this.onError = (e) => {
+                console.error(e);
+            };
+        }
+    }
+
+    const handleSign = () => {
+        console.log("SIGN")
+        sign().then(r => console.log(r))
+    }
+
+
+    const sign = async () => {
+        const xml = ""
+        const xsdSchema = ""
+        const xsltSchema = ""
+        const pdfBase64 =  ""
+        const ditec = (window).ditec;
+
+        console.log("TESTER")
+
+        // @ts-ignore
+        ditec.dSigXadesJs.deploy(
+            null,
+            new Callback(function () {
+                ditec.dSigXadesJs.initialize(
+                    new Callback(function () {
+                        ditec.dSigXadesJs.addXmlObject2(
+                            "one",
+                            "Reservation",
+                            xml,
+                            xsdSchema,
+                            "http://gamesReservation",
+                            "http://www.w3.org/2001/XMLSchema",
+                            xsltSchema,
+                            "https://www.w3.org/1999/XSL/Transform",
+                            "HTML",
+                            new Callback(function () {
+                                ditec.dSigXadesJs.addPdfObject(
+                                    "two",
+                                    "ReservationPDF",
+                                    pdfBase64?.split(`,`)[1],
+                                    "",
+                                    "http://objectFormatIdentifier",
+                                    3,
+                                    false,
+                                    new Callback(function () {
+                                        ditec.dSigXadesJs.sign11(
+                                            "signatureId",
+                                            "http://www.w3.org/2001/04/xmlenc#sha256",
+                                            "urn:oid:1.3.158.36061701.1.2.3",
+                                            "dataEnvelopeId",
+                                            "http://dataEnvelopeURI",
+                                            "dataEnvelopeDescr",
+                                            new Callback(function () {
+                                                ditec.dSigXadesJs.getSignedXmlWithEnvelope();
+                                            })
+                                        );
+                                    })
+                                );
+                            })
+                        );
+                    })
+                );
+            })
+        );
+    };
+
+
     return (
         <main className="">
             <form className="" onSubmit={handleSubmit}>
@@ -136,7 +209,7 @@ function App() {
                 <button type="button" onClick={() => transformData()}>
                     Transform data
                 </button>
-                <button type="button" onClick={() => SignComponent()}>
+                <button type="button" onClick={handleSign}>
                     Sign data
                 </button>
             </form>

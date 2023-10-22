@@ -35,8 +35,7 @@ public class SignResource implements ISignResource {
                 .body(resource);
     }
 
-    // return XML that FE signs with ditec
-    @GetMapping(path = "/sign", produces = "application/xml")
+    @GetMapping(path = "/sign", produces = "application/pdf")
     @Override
     public ResponseEntity<String> sign() {
         try {
@@ -45,5 +44,23 @@ public class SignResource implements ISignResource {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body("Sign error: " + e.getMessage());
         }
+    }
+
+    @GetMapping(path = "/getxml", produces = "application/xml")
+    @Override
+    public String getXml() {
+        return signService.getXml();
+    }
+
+    @GetMapping(path = "/getxsd", produces = "application/xml")
+    @Override
+    public String getXsd() {
+        return signService.getXsd();
+    }
+
+    @GetMapping(path = "/getxsl", produces = "application/xml")
+    @Override
+    public String getXsl() {
+        return signService.getXsl();
     }
 }

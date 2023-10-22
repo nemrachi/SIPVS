@@ -9,4 +9,10 @@ public interface ISignResource {
 
     ResponseEntity<String> sign();
 
+    String getXml();
+
+    String getXsd();
+
+    String getXsl();
+
 }

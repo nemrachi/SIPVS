@@ -11,7 +11,7 @@ import java.util.List;
 public class LibraryLoan {
 
     @XmlAttribute(name = "xmlns")
-    private String xmlns="http://library.com/loan";
+    private String xmlns = "http://library.com/loan";
 
     @XmlAttribute(name = "loan_id")
     private String loanId;

@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 
@@ -46,14 +47,33 @@ public class SignService implements ISignService {
 
     @Override
     public String sign() {
+        // toto este neviem co naco bude
+        return null;
+    }
+
+    @Override
+    public String getXml() {
+        return readFile(AppConfig.XML);
+    }
+
+    @Override
+    public String getXsd() {
+        return readFile(AppConfig.XSD);
+    }
+
+    @Override
+    public String getXsl() {
+        return readFile(AppConfig.XSL);
+    }
+
+    private String readFile(String filename) {
+        byte[] bytes = new byte[0];
         try {
-            return new String(Files.readAllBytes(Paths.get(AppConfig.XML)));
+            bytes = Files.readAllBytes(Paths.get(filename));
         } catch (IOException e) {
-            System.err.println("Sign error: " + e.getMessage());
-            throw new RuntimeException(e.getMessage());
-        } finally {
-            System.out.println("XML send for signature.");
+            throw new RuntimeException(e);
         }
+        return new String(bytes, StandardCharsets.UTF_8);
     }
 
 

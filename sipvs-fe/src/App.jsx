@@ -70,7 +70,7 @@ function App() {
 
     const handleSign = () => {
         console.log("SIGN")
-        sign().then(r => console.log(r))
+        SignComponent()
     }
 
 
@@ -80,15 +80,22 @@ function App() {
         const xsltSchema = ""
         const pdfBase64 =  ""
         const ditec = (window).ditec;
+        let signState = 0;
 
-        console.log("TESTER")
+        console.log("TESTER:", signState)
 
         // @ts-ignore
-        ditec.dSigXadesJs.deploy(
+        await ditec.dSigXadesJs.deploy(
             null,
             new Callback(function () {
+                signState = 1
+                alert(signState)
                 ditec.dSigXadesJs.initialize(
                     new Callback(function () {
+                        signState = 2
+                        alert(signState)
+
+
                         ditec.dSigXadesJs.addXmlObject2(
                             "one",
                             "Reservation",
@@ -100,6 +107,10 @@ function App() {
                             "https://www.w3.org/1999/XSL/Transform",
                             "HTML",
                             new Callback(function () {
+                                signState = 3
+                                alert(signState)
+
+
                                 ditec.dSigXadesJs.addPdfObject(
                                     "two",
                                     "ReservationPDF",
@@ -109,6 +120,10 @@ function App() {
                                     3,
                                     false,
                                     new Callback(function () {
+                                        signState = 4
+                                        alert(signState)
+
+
                                         ditec.dSigXadesJs.sign11(
                                             "signatureId",
                                             "http://www.w3.org/2001/04/xmlenc#sha256",
@@ -117,7 +132,12 @@ function App() {
                                             "http://dataEnvelopeURI",
                                             "dataEnvelopeDescr",
                                             new Callback(function () {
-                                                ditec.dSigXadesJs.getSignedXmlWithEnvelope();
+                                                signState = 5
+                                                alert(signState)
+                                                ditec.dSigXadesJs.getSignedXmlWithEnvelope(
+                                                    new Callback(function (ret) {
+                                                        console.log("GOOD FINITO, later by vol save xml")
+                                                    }));
                                             })
                                         );
                                     })
@@ -128,6 +148,7 @@ function App() {
                 );
             })
         );
+        console.log("Finito v state:", signState)
     };
 
 

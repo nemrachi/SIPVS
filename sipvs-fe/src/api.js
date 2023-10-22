@@ -25,6 +25,37 @@ export const signData = async () => {
    await sign
 };
 
+export const getXSD = async () => {
+    try {
+        const response = await axios.get('/api/zadanie2/getxsd');
+        return response.data
+    } catch (error) {
+        console.log("XSD error", error)
+        alert(error.response);
+    }
+};
+
+export const getXSL = async () => {
+    try {
+        const response = await axios.get('/api/zadanie2/getxsl');
+        return response.data;
+    } catch (error) {
+        console.log("XSL error", error)
+        alert(error.response);
+    }
+};
+
+export const getXML = async () => {
+    try {
+        const response = await axios.get('/api/zadanie2/getxml');
+        console.log("XML Response",response)
+        return response.data;
+    } catch (error) {
+        console.log("XLM error", error)
+        alert(error.response);
+    }
+};
+
 export const confirmData = async (loan) => {
     try {
         const data_to_send = { ...loan };

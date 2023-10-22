@@ -1,10 +1,10 @@
 import React, {useState} from 'react';
-import axios from 'axios';
+import { validateData, transformData, signData, confirmData } from './api';
+
+
 import SignComponent from './SignComponent';
 
 function App() {
-    const [wizard, setWizard] = useState(false);
-
     const EMPTY_LOAN = {
         loanId: "",
         librarianId: 0,
@@ -15,9 +15,7 @@ function App() {
         dueDate: "",
         loanedBooks: [{"isbn": ""}]
     }
-
     const [loan, setLoan] = useState(EMPTY_LOAN);
-
     const handleChange = (e, nested) => {
         const value = e.target.value;
         if (nested) {
@@ -25,36 +23,10 @@ function App() {
         } else {
             setLoan({...loan, [e.target.name]: value});
         }
-        if (value === "magic") {
-            doMagic()
-        } else if (value === "mukel") {
-            setWizard(false)
-        }
     }
 
     const resetLoan = () => {
         setLoan(EMPTY_LOAN)
-    }
-
-    const doMagic = () => {
-        setWizard(true)
-        setLoan({
-            "loanId": "L000002",
-            "librarianId": 2,
-            "borrower": {
-                "cardNumber": "ABCDEFG"
-            },
-            "dateOfLoan": "2023-10-05",
-            "dueDate": "2023-11-05",
-            "loanedBooks": [
-                {
-                    "isbn": "0123456789"
-                },
-                {
-                    "isbn": "0123456789012"
-                }
-            ]
-        })
     }
 
     const handleBookChange = (e, index) => {
@@ -73,112 +45,23 @@ function App() {
         setLoan({...loan, loanedBooks: tempBooks})
     }
 
-    function switchDate(timestamp) {
-        // Create a new Date object
-        let date = new Date(timestamp);
-
-        // Format the date
-        let year = date.getFullYear();
-        let month = ("0" + (date.getMonth() + 1)).slice(-2); // Add leading 0 if necessary
-        let day = ("0" + date.getDate()).slice(-2); // Add leading 0 if necessary
-
-        // New timestamp
-        let newTimestamp = `${year}-${month}-${day}`;
-
-        return newTimestamp;
-    }
-
     const handleSubmit = (e) => {
         if (new Date(loan.dueDate) < new Date(loan.dateOfLoan)) {
             alert("Date of lean cannot be later than due date.")
             return
         }
-
-
         e.preventDefault();
-        confirmData().then(() => {
+        confirmData(loan).then(() => {
             resetLoan()
         })
         console.log(loan);
     }
 
-    const confirmData = async () => {
-        try {
-
-            const data_to_send = loan
-            data_to_send.dateOfLoan = switchDate(loan.dateOfLoan)
-            data_to_send.dueDate = switchDate(loan.dueDate)
-            data_to_send.librarianId = parseInt(loan.librarianId)
-            data_to_send.loanedBooks = loan.loanedBooks.map(item => {
-                return { "isbn": item };
-            })
-
-            const response = await axios.post('/api/zadanie1/save', loan);
-            alert(response.data)
-            // UNCOMMENT TO DOWNLOAD FILE
-            //
-            // // Create a temporary URL for the blob
-            // const blob = new Blob([response.data], {type: response.headers['content-type']});
-            // const url = window.URL.createObjectURL(blob);
-            //
-            // // Create a link element to trigger the download
-            // const a = document.createElement('a');
-            // a.href = url;
-            // a.download = 'returned_file.txt'; // Set the desired file name and extension
-            //
-            // // Trigger a click event on the link to start the download
-            // a.click();
-            //
-            // // Trigger a click event on the link to start the download
-            // window.URL.revokeObjectURL(url);
-        } catch (error) {
-            alert(error.error.data)
-        }
-    };
-    const validateData = async () => {
-        try {
-            const response = await axios.get('/api/zadanie1/validate');
-            alert(response.data)
-
-        } catch (error) {
-            alert(error.response.data)
-        }
-    };
-
-    const transformData = async () => {
-        try {
-            const response = await axios.get('/api/zadanie1/transform');
-            alert(response.data)
-
-        } catch (error) {
-            alert(error.response.data)
-        }
-    };
-
-    const signData = async () => {
-        try {
-            const response = await axios.get('/api/zadanie1/sign');
-            alert(response.data)
-
-        } catch (error) {
-            alert(error.response.data)
-        }
-    };
 
     return (
         <main className="">
-            <form className="" onSubmit={handleSubmit} style={{
-                display: "block",
-                maxWidth: "min-content",
-                textAlign: "center",
-                marginLeft: "auto",
-                marginRight: "auto",
-                marginTop: "7%",
-                padding: "25px",
-                borderRadius: "7px",
-                boxShadow: "1px 7px 13px 7px lightgrey"
-            }}>
-                <h1>Loan a book{wizard && "🧙‍♂️"}</h1>
+            <form className="" onSubmit={handleSubmit}>
+                <h1>Loan a book</h1>
 
                 <table>
                     <tbody>
@@ -222,7 +105,7 @@ function App() {
                         </td>
                     </tr>
                     {loan.loanedBooks.map((book, index) => {
-                        return <tr>
+                        return <tr key={index}>
                             <td>ISBN</td>
                             <td>
                                 <input required type="text" placeholder="0123456789"
@@ -243,15 +126,6 @@ function App() {
                         +
                     </button>
                 </table>
-                {/*{loan.loanedBooks.map((book, index) => {*/}
-                {/*    return <label>*/}
-                {/*        ISBN of Book:*/}
-                {/*        <div className="flex gap-2 pr-1 leading-[2.2]">*/}
-
-                {/*            }*/}
-                {/*        </div>*/}
-                {/*    </label>*/}
-                {/*})}*/}
                 <hr/>
                 <button type="submit">
                     Submit data
@@ -265,10 +139,6 @@ function App() {
                 <button type="button" onClick={() => SignComponent()}>
                     Sign data
                 </button>
-                {wizard && <button type="button"
-                                   onClick={() => alert("Crying... 😓🥺😭😭")}>
-                    😭 Cry
-                </button>}
             </form>
         </main>
     )

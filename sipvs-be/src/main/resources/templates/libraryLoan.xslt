@@ -1,106 +1,75 @@
-<?xml version="1.0" encoding="utf-8" standalone="no" ?>
-<xsl:stylesheet xmlns="http://www.w3.org/1999/xhtml" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
-    <xsl:output method="xml" encoding="utf-8" indent="yes"
-                doctype-system="http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"
-                doctype-public="-//W3C//DTD XHTML 1.0 Transitional//EN"/>
-    <xsl:template match="/">
-        <xsl:element name="body">
-            <xsl:element name="h1">
-                Loan a book
-            </xsl:element>
-            <xsl:element name="table">
-                <xsl:element name="tr">
-                    <xsl:element name="td">
-                        Loan ID
-                    </xsl:element>
-                    <xsl:element name="td">
-                        <xsl:element name="input">
-                            <xsl:attribute name="type">text</xsl:attribute>
-                            <xsl:attribute name="disabled">disabled</xsl:attribute>
-                            <xsl:attribute name="value">L000002</xsl:attribute>
-                        </xsl:element>
-                    </xsl:element>
-                    <xsl:element name="tr">
-                        <xsl:element name="td">
-                            Librarian ID
-                        </xsl:element>
-                        <xsl:element name="td">
-                            <xsl:element name="input">
-                                <xsl:attribute name="type">number</xsl:attribute>
-                                <xsl:attribute name="disabled">disabled</xsl:attribute>
-                                <xsl:attribute name="value">2</xsl:attribute>
-                            </xsl:element>
-                        </xsl:element>
-                        <xsl:element name="tr">
-                            <xsl:element name="td">
-                                Borrower Card Number
-                            </xsl:element>
-                            <xsl:element name="td">
-                                <xsl:element name="input">
-                                    <xsl:attribute name="type">text</xsl:attribute>
-                                    <xsl:attribute name="disabled">disabled</xsl:attribute>
-                                    <xsl:attribute name="value">ABCDEFG</xsl:attribute>
-                                </xsl:element>
-                            </xsl:element>
-                            <xsl:element name="tr">
-                                <xsl:element name="td">
-                                    Date Of Loan
-                                </xsl:element>
-                                <xsl:element name="td">
-                                    <xsl:element name="input">
-                                        <xsl:attribute name="type">date</xsl:attribute>
-                                        <xsl:attribute name="disabled">disabled</xsl:attribute>
-                                        <xsl:attribute name="value">2023-10-05</xsl:attribute>
-                                    </xsl:element>
-                                </xsl:element>
-                                <xsl:element name="tr">
-                                    <xsl:element name="td">
-                                        Due Date
-                                    </xsl:element>
-                                    <xsl:element name="td">
-                                        <xsl:element name="input">
-                                            <xsl:attribute name="type">date</xsl:attribute>
-                                            <xsl:attribute name="disabled">disabled</xsl:attribute>
-                                            <xsl:attribute name="value">2023-11-05</xsl:attribute>
-                                        </xsl:element>
-                                    </xsl:element>
-                                    <xsl:element name="tr">
-                                        <xsl:element name="td">
-                                            <xsl:element name="h3">
-                                                Books
-                                            </xsl:element>
-                                        </xsl:element>
-                                    </xsl:element>
-                                    <xsl:element name="tr">
-                                        <xsl:element name="td">
-                                            ISBN
-                                        </xsl:element>
-                                        <xsl:element name="td">
-                                            <xsl:element name="input">
-                                                <xsl:attribute name="type">text</xsl:attribute>
-                                                <xsl:attribute name="disabled">disabled</xsl:attribute>
-                                                <xsl:attribute name="value">9780451524935</xsl:attribute>
-                                            </xsl:element>
-                                        </xsl:element>
-                                        <xsl:element name="tr">
-                                            <xsl:element name="td">
-                                                ISBN
-                                            </xsl:element>
-                                            <xsl:element name="td">
-                                                <xsl:element name="input">
-                                                    <xsl:attribute name="type">text</xsl:attribute>
-                                                    <xsl:attribute name="disabled">disabled</xsl:attribute>
-                                                    <xsl:attribute name="value">9780486282114</xsl:attribute>
-                                                </xsl:element>
-                                            </xsl:element>
-                                        </xsl:element>
-                                    </xsl:element>
-                                </xsl:element>
-                            </xsl:element>
-                        </xsl:element>
-                    </xsl:element>
-                </xsl:element>
-            </xsl:element>
-        </xsl:element>
+<?xml version="1.0" encoding="UTF-8"?>
+<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+                xmlns:fo="http://www.w3.org/1999/XSL/Format"
+                xmlns:l="http://library.com/loan"
+                version="1.0">
+
+    <xsl:template match="l:libraryLoan">
+        <fo:root>
+            <fo:layout-master-set>
+                <fo:simple-page-master master-name="A4" page-height="29.7cm" page-width="21cm"
+                                       margin-top="1cm" margin-bottom="1cm" margin-left="2cm" margin-right="2cm">
+                    <fo:region-body margin-top="1.5cm"/>
+                </fo:simple-page-master>
+            </fo:layout-master-set>
+
+            <fo:page-sequence master-reference="A4">
+                <fo:flow flow-name="xsl-region-body">
+                    <fo:block font-size="20pt" text-align="center" space-after.optimum="20pt">
+                        <fo:inline font-weight="bold">Library loan</fo:inline>
+                    </fo:block>
+
+                    <fo:block space-after.optimum="10pt">
+                        <fo:inline font-weight="bold">Loan ID:</fo:inline>
+                        <fo:inline>
+                            <xsl:value-of select="@loan_id"/>
+                        </fo:inline>
+                    </fo:block>
+
+                    <fo:block space-after.optimum="10pt">
+                        <fo:inline font-weight="bold">Librarian ID:</fo:inline>
+                        <fo:inline>
+                            <xsl:value-of select="l:librarianId"/>
+                        </fo:inline>
+                    </fo:block>
+
+                    <fo:block space-after.optimum="10pt">
+                        <fo:inline font-weight="bold">Borrower Card Number:</fo:inline>
+                        <fo:inline>
+                            <xsl:value-of select="l:borrower/l:cardNumber"/>
+                        </fo:inline>
+                    </fo:block>
+
+                    <fo:block space-after.optimum="10pt">
+                        <fo:inline font-weight="bold">Date Of Loan:</fo:inline>
+                        <fo:inline>
+                            <xsl:value-of select="l:dateOfLoan"/>
+                        </fo:inline>
+                    </fo:block>
+
+                    <fo:block space-after.optimum="10pt">
+                        <fo:inline font-weight="bold">Due Date:</fo:inline>
+                        <fo:inline>
+                            <xsl:value-of select="l:dueDate"/>
+                        </fo:inline>
+                    </fo:block>
+
+                    <fo:block space-after.optimum="10pt">
+                        <fo:inline font-weight="bold">Borrowed books:</fo:inline>
+                    </fo:block>
+
+                    <!-- Iterate through borrowed books -->
+                    <xsl:for-each select="l:borrowedBooks/l:book">
+                        <fo:block start-indent="30pt" space-after.optimum="10pt">
+                            <fo:inline font-weight="bold">ISBN:</fo:inline>
+                            <fo:inline>
+                                <xsl:value-of select="l:isbn"/>
+                            </fo:inline>
+                        </fo:block>
+                    </xsl:for-each>
+
+                </fo:flow>
+            </fo:page-sequence>
+        </fo:root>
     </xsl:template>
 </xsl:stylesheet>

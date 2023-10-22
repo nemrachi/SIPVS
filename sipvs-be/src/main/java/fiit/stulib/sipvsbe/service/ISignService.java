@@ -1,10 +1,10 @@
 package fiit.stulib.sipvsbe.service;
 
+import org.springframework.core.io.FileSystemResource;
+
 public interface ISignService {
 
-    byte[] createPdfFromXml();
-
-    byte[] createPdfFromHtml();
+    FileSystemResource createPdfFromXml();
 
     String sign();
 

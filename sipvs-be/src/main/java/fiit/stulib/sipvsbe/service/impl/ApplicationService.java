@@ -30,16 +30,10 @@ public class ApplicationService implements IApplicationService {
     @Override
     public void save(LibraryLoan libraryLoan) {
         try {
-            // Create a JAXB context for the LibraryLoan class
             JAXBContext context = JAXBContext.newInstance(LibraryLoan.class);
 
-            // Create a Marshaller
             Marshaller marshaller = context.createMarshaller();
-
-            // Pretty-print the XML (optional)
             marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
-
-            // Marshal the LibraryLoan object to an XML file
             marshaller.marshal(libraryLoan, new File(AppConfig.XML));
 
             System.out.println("LibraryLoan object saved to result.xml");
@@ -52,16 +46,10 @@ public class ApplicationService implements IApplicationService {
     @Override
     public void validate() {
         try {
-            // Create a SchemaFactory for XML Schema
             SchemaFactory factory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
-
-            // Load the XSD schema from a file (replace with your XSD file)
             Schema schema = factory.newSchema(new File(AppConfig.XSD));
 
-            // Create a Validator from the schema
             Validator validator = schema.newValidator();
-
-            // Validate the XML file (replace with your XML file)
             validator.validate(new StreamSource(new File(AppConfig.XML)));
 
             System.out.println("Validation successful. XML is valid against the XSD.");
@@ -77,19 +65,12 @@ public class ApplicationService implements IApplicationService {
     @Override
     public void transform() {
         try {
-            // Create a TransformerFactory
             TransformerFactory transformerFactory = TransformerFactory.newInstance();
-
-            // Load the XSLT stylesheet (replace with your XSLT file)
             Source xslt = new StreamSource(new File(AppConfig.XSL));
 
-            // Create a Transformer with the XSLT stylesheet
             Transformer transformer = transformerFactory.newTransformer(xslt);
-
-            // Load the input XML file (replace with your XML file)
             Source xmlInput = new StreamSource(new File(AppConfig.XML));
 
-            // Perform the transformation and save the result to an HTML file
             transformer.transform(xmlInput, new StreamResult(new File(AppConfig.HTML)));
 
             System.out.println("Transformation successful. HTML file created.");

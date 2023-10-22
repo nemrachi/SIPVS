@@ -1,13 +1,11 @@
 package fiit.stulib.sipvsbe.controller;
 
-import org.springframework.core.io.ByteArrayResource;
+import org.springframework.core.io.Resource;
 import org.springframework.http.ResponseEntity;
 
 public interface ISignResource {
 
-    ResponseEntity<ByteArrayResource> generatePdfFromXml();
-
-    ResponseEntity<ByteArrayResource> generatePdfFromHtml();
+    ResponseEntity<Resource> generatePdfFromXml();
 
     ResponseEntity<String> sign();
 

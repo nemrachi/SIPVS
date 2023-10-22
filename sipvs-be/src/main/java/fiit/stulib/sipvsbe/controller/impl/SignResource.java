@@ -4,7 +4,7 @@ import fiit.stulib.sipvsbe.controller.ISignResource;
 import fiit.stulib.sipvsbe.service.ISignService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.io.ByteArrayResource;
+import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -12,6 +12,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.io.IOException;
 
 @Slf4j
 @RestController
@@ -23,30 +25,25 @@ public class SignResource implements ISignResource {
 
     @GetMapping("/generatePdfFromXml")
     @Override
-    public ResponseEntity<ByteArrayResource> generatePdfFromXml() {
-        byte[] pdfData = signService.createPdfFromXml();
+    public ResponseEntity<Resource> generatePdfFromXml() {
 
-        ByteArrayResource resource = new ByteArrayResource(pdfData);
+        Resource pdfFile = signService.createPdfFromXml();
 
-        return ResponseEntity.ok()
-                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment;filename=generated-document.pdf")
-                .contentType(MediaType.APPLICATION_PDF)
-                .contentLength(pdfData.length)
-                .body(resource);
-    }
+        HttpHeaders headers = new HttpHeaders();
+        headers.add(HttpHeaders.CONTENT_DISPOSITION, "inline;filename=" + pdfFile.getFilename());
+        
+        MediaType mediaType = MediaType.APPLICATION_PDF;
 
-    @GetMapping("/generatePdfFromHtml")
-    @Override
-    public ResponseEntity<ByteArrayResource> generatePdfFromHtml() {
-        byte[] pdfData = signService.createPdfFromHtml();
+        try {
+            return ResponseEntity.ok()
+                    .headers(headers)
+                    .contentLength(pdfFile.contentLength())
+                    .contentType(mediaType)
+                    .body(pdfFile);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
 
-        ByteArrayResource resource = new ByteArrayResource(pdfData);
-
-        return ResponseEntity.ok()
-                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment;filename=generated-document.pdf")
-                .contentType(MediaType.APPLICATION_PDF)
-                .contentLength(pdfData.length)
-                .body(resource);
     }
 
     @GetMapping(path = "/sign", produces = "application/pdf")

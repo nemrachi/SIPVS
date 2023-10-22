@@ -56,6 +56,15 @@ export const getXML = async () => {
     }
 };
 
+export const getPDF = async () => {
+    try {
+        const response = await axios.get('/api/zadanie2/generatePdfFromXml');
+        return response.data;
+    } catch (error) {
+        alert(error.response);
+    }
+};
+
 export const confirmData = async (loan) => {
     try {
         const data_to_send = { ...loan };

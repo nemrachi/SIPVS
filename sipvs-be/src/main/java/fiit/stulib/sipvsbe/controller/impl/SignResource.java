@@ -21,10 +21,24 @@ public class SignResource implements ISignResource {
     @Autowired
     private ISignService signService;
 
-    @GetMapping("/generatePdf")
+    @GetMapping("/generatePdfFromXml")
     @Override
-    public ResponseEntity<ByteArrayResource> generatePdf() {
+    public ResponseEntity<ByteArrayResource> generatePdfFromXml() {
         byte[] pdfData = signService.createPdfFromXml();
+
+        ByteArrayResource resource = new ByteArrayResource(pdfData);
+
+        return ResponseEntity.ok()
+                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment;filename=generated-document.pdf")
+                .contentType(MediaType.APPLICATION_PDF)
+                .contentLength(pdfData.length)
+                .body(resource);
+    }
+
+    @GetMapping("/generatePdfFromHtml")
+    @Override
+    public ResponseEntity<ByteArrayResource> generatePdfFromHtml() {
+        byte[] pdfData = signService.createPdfFromHtml();
 
         ByteArrayResource resource = new ByteArrayResource(pdfData);
 

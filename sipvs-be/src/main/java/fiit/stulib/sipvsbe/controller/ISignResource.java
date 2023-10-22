@@ -5,7 +5,9 @@ import org.springframework.http.ResponseEntity;
 
 public interface ISignResource {
 
-    ResponseEntity<ByteArrayResource> generatePdf();
+    ResponseEntity<ByteArrayResource> generatePdfFromXml();
+
+    ResponseEntity<ByteArrayResource> generatePdfFromHtml();
 
     ResponseEntity<String> sign();
 

@@ -4,6 +4,8 @@ public interface ISignService {
 
     byte[] createPdfFromXml();
 
+    byte[] createPdfFromHtml();
+
     String sign();
 
     String getXml();

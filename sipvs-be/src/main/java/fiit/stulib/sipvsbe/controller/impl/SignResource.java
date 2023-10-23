@@ -5,15 +5,15 @@ import fiit.stulib.sipvsbe.service.ISignService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.util.StreamUtils;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.io.IOException;
+import java.util.Base64;
 
 @Slf4j
 @RestController
@@ -25,26 +25,18 @@ public class SignResource implements ISignResource {
 
     @GetMapping("/generatePdfFromXml")
     @Override
-    public ResponseEntity<Resource> generatePdfFromXml() {
-
+    public String generatePdfFromXml() {
         Resource pdfFile = signService.createPdfFromXml();
 
-        HttpHeaders headers = new HttpHeaders();
-        headers.add(HttpHeaders.CONTENT_DISPOSITION, "inline;filename=" + pdfFile.getFilename());
-        
-        MediaType mediaType = MediaType.APPLICATION_PDF;
-
+        byte[] pdfBytes = null;
         try {
-            return ResponseEntity.ok()
-                    .headers(headers)
-                    .contentLength(pdfFile.contentLength())
-                    .contentType(mediaType)
-                    .body(pdfFile);
+            pdfBytes = StreamUtils.copyToByteArray(pdfFile.getInputStream());
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-
+        return Base64.getEncoder().encodeToString(pdfBytes);
     }
+
 
     @GetMapping(path = "/sign", produces = "application/pdf")
     @Override

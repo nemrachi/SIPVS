@@ -20,11 +20,6 @@ export const transformData = async () => {
         alert(error.response.data);
     }
 };
-
-export const signData = async () => {
-   await sign
-};
-
 export const getXSD = async () => {
     try {
         const response = await axios.get('/api/zadanie2/getxsd');
@@ -76,7 +71,7 @@ export const confirmData = async (loan) => {
         });
 
         const response = await axios.post('/api/zadanie1/save', data_to_send);
-        alert(response.data);
+        alert(response.data)
         // UNCOMMENT TO DOWNLOAD FILE
         //
         // const blob = new Blob([response.data], {type: response.headers['content-type']});

@@ -1,5 +1,5 @@
 import React, {useState} from 'react';
-import { validateData, transformData, signData, confirmData } from './api';
+import { validateData, transformData, confirmData } from './api';
 
 
 import SignComponent from './SignComponent';
@@ -57,123 +57,43 @@ function App() {
         console.log(loan);
     }
 
-
-    // SIGN LOGIC
-
-    class Callback {
-        constructor() {
-            this.onError = (e) => {
-                console.error(e);
-            };
-        }
-    }
-
     const handleSign = () => {
-        console.log("SIGN")
-        SignComponent()
+        SignComponent().then(r => console.log(r))
     }
 
+    const isInputInvalid = (pattern, value ) => {
 
-    const sign = async () => {
-        const xml = ""
-        const xsdSchema = ""
-        const xsltSchema = ""
-        const pdfBase64 =  ""
-        const ditec = (window).ditec;
-        let signState = 0;
+        console.log(value)
+        if (value){
+            return !pattern.test(value) && value.length > 1;
+        }
 
-        console.log("TESTER:", signState)
-
-        // @ts-ignore
-        await ditec.dSigXadesJs.deploy(
-            null,
-            new Callback(function () {
-                signState = 1
-                alert(signState)
-                ditec.dSigXadesJs.initialize(
-                    new Callback(function () {
-                        signState = 2
-                        alert(signState)
-
-
-                        ditec.dSigXadesJs.addXmlObject2(
-                            "one",
-                            "Reservation",
-                            xml,
-                            xsdSchema,
-                            "http://gamesReservation",
-                            "http://www.w3.org/2001/XMLSchema",
-                            xsltSchema,
-                            "https://www.w3.org/1999/XSL/Transform",
-                            "HTML",
-                            new Callback(function () {
-                                signState = 3
-                                alert(signState)
-
-
-                                ditec.dSigXadesJs.addPdfObject(
-                                    "two",
-                                    "ReservationPDF",
-                                    pdfBase64?.split(`,`)[1],
-                                    "",
-                                    "http://objectFormatIdentifier",
-                                    3,
-                                    false,
-                                    new Callback(function () {
-                                        signState = 4
-                                        alert(signState)
-
-
-                                        ditec.dSigXadesJs.sign11(
-                                            "signatureId",
-                                            "http://www.w3.org/2001/04/xmlenc#sha256",
-                                            "urn:oid:1.3.158.36061701.1.2.3",
-                                            "dataEnvelopeId",
-                                            "http://dataEnvelopeURI",
-                                            "dataEnvelopeDescr",
-                                            new Callback(function () {
-                                                signState = 5
-                                                alert(signState)
-                                                ditec.dSigXadesJs.getSignedXmlWithEnvelope(
-                                                    new Callback(function (ret) {
-                                                        console.log("GOOD FINITO, later by vol save xml")
-                                                    }));
-                                            })
-                                        );
-                                    })
-                                );
-                            })
-                        );
-                    })
-                );
-            })
-        );
-        console.log("Finito v state:", signState)
     };
-
-
     return (
         <main className="">
             <form className="" onSubmit={handleSubmit}>
                 <h1>Loan a book</h1>
-
                 <table>
                     <tbody>
                     <tr>
                         <td>Loan ID</td>
                         <td><input required pattern="[A-Z][0-9]{6}" type="text" name="loanId" value={loan.loanId}
-                                   onChange={handleChange} placeholder="X123456"/></td>
+                                   onChange={handleChange} placeholder="X123456"/>
+                            {isInputInvalid(/^[A-Z][0-9]{6}$/, loan.loanId) && <td className="error-message">Loan ID is not in correct format</td>}
+                        </td>
                     </tr>
                     <tr>
                         <td>Librarian ID</td>
-                        <td><input type="number" name="librarianId" value={loan.librarianId} onChange={handleChange}
+                        <td><input type="number" min="0" name="librarianId" value={loan.librarianId} onChange={handleChange}
                                    placeholder="1"/></td>
                     </tr>
                     <tr>
                         <td>Borrower Card Number</td>
-                        <td><input required type="text" name="cardNumber" value={loan.borrower.cardNumber}
+                        <td><input required type="text" pattern="[A-Z0-9]{7}" name="cardNumber" value={loan.borrower.cardNumber}
                                    onChange={(e) => handleChange(e, "borrower")}
-                                   placeholder="ABC1DEF"/></td>
+                                   placeholder="ABC1DEF"/>
+                            {isInputInvalid(/^[A-Z0-9]{7}$/, loan.borrower.cardNumber) && <td className="error-message">Borrower card number is not in correct format</td>}
+                        </td>
                     </tr>
                     <tr>
                         <td>Date Of Loan</td>
@@ -207,30 +127,32 @@ function App() {
                                        key={index}
                                        value={book.isbn}
                                        onChange={(e) => handleBookChange(e, index)}/>
+                                {isInputInvalid(/^[0-9]{10}|[0-9]{13}$/, book) && <td className="error-message">ISBN is not in correct format</td>}
                             </td>
                             <td>
                                 {loan.loanedBooks.length > 1 &&
-                                    <div onClick={() => removeBook(index)}>X</div>
+                                    <button onClick={() => removeBook(index)}>X</button>
                                 }
                             </td>
                         </tr>
                     })}
                     </tbody>
-                    <button type="button" onClick={addBook}>
-                        +
+                    <td></td>
+                    <button type="button" className="button-gray button-extra" onClick={addBook}>
+                        Add book +
                     </button>
                 </table>
                 <hr/>
-                <button type="submit">
+                <button className="button-gray" type="submit">
                     Submit data
                 </button>
-                <button type="button" onClick={() => validateData()}>
+                <button className="button-gray" type="button" onClick={() => validateData()}>
                     Validate data
                 </button>
-                <button type="button" onClick={() => transformData()}>
+                <button className="button-gray" type="button" onClick={() => transformData()}>
                     Transform data
                 </button>
-                <button type="button" onClick={handleSign}>
+                <button type="button" className="button-gray "  onClick={handleSign}>
                     Sign data
                 </button>
             </form>

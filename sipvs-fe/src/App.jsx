@@ -1,6 +1,5 @@
-import React, {useState} from 'react';
+import React, { useState } from 'react';
 import { validateData, transformData, confirmData } from './api';
-
 
 import SignComponent from './SignComponent';
 
@@ -61,13 +60,10 @@ function App() {
         SignComponent().then(r => console.log(r))
     }
 
-    const isInputInvalid = (pattern, value ) => {
-
-        console.log(value)
-        if (value){
+    const isInputInvalid = (pattern, value) => {
+        if (value) {
             return !pattern.test(value) && value.length > 1;
         }
-
     };
     return (
         <main className="">
@@ -137,11 +133,10 @@ function App() {
                         </tr>
                     })}
                     </tbody>
-                    <td></td>
-                    <button type="button" className="button-gray button-extra" onClick={addBook}>
-                        Add book +
-                    </button>
                 </table>
+                <button type="button" className="button-gray button-extra" onClick={addBook}>
+                    Add book +
+                </button>
                 <hr/>
                 <button className="button-gray" type="submit">
                     Submit data
@@ -152,13 +147,12 @@ function App() {
                 <button className="button-gray" type="button" onClick={() => transformData()}>
                     Transform data
                 </button>
-                <button type="button" className="button-gray "  onClick={handleSign}>
+                <button type="button" className="button-gray" onClick={handleSign}>
                     Sign data
                 </button>
             </form>
         </main>
-    )
-        ;
+    );
 }
 
 export default App;

@@ -71,7 +71,7 @@ export const confirmData = async (loan) => {
     });
 
     const response = await axios.post("/api/zadanie1/save", data_to_send);
-    alert(response.data);
+    alert("Submited!");
     // UNCOMMENT TO DOWNLOAD FILE
     //
     // const blob = new Blob([response.data], {type: response.headers['content-type']});

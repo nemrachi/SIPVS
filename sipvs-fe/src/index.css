@@ -1,15 +1,48 @@
 td {
-    text-align: left;
+  text-align: left;
 }
 
 form {
-    display: block;
-    max-width: min-content;
-    text-align: center;
-    margin-left: auto;
-    margin-right: auto;
-    margin-top: 7%;
-    padding: 25px;
-    border-radius: 7px;
-    box-shadow: 1px 7px 13px 7px lightgrey;
+  display: block;
+  max-width: min-content;
+  text-align: center;
+  margin-left: auto;
+  margin-right: auto;
+  margin-top: 7%;
+  padding: 25px;
+  border-radius: 7px;
+  box-shadow: 1px 7px 13px 7px lightgrey;
+}
+
+.button-gray {
+  background-color: #e7e7e7;
+  color: black;
+  border: 2px solid #e7e7e7;
+  margin: 4px 2px;
+  border: none;
+  padding: 8px 8px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 14px;
+  transition-duration: 0.4s;
+  cursor: pointer;
+  border-radius: 8px;
+}
+
+.button-gray:hover {
+  background-color: #989898;
+}
+
+.error-message {
+  color: red;
+  font-size: 14px;
+}
+
+table {
+  width: 300px;
+}
+
+.button-extra {
+  width: 100%;
 }

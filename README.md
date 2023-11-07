@@ -134,19 +134,12 @@ npm run dev
 - **? ako to spojazdnit ?**
 
 ---
-# 2.zadanie
-- nové tlačidlo
-  - [x] pridať nové tlačidlo na existujúci formulár s názvom “Podpísať”
-  - [ ] zavolať podpisovač a jedným podpisom podpísať
-    - objekt xml dáta s xsd a xslt
-    - objekt pdf
-  - [ ] uložiť výstup z podpisovača do súboru s xml koncovkou (```xades.xml```)
-    - xades podpis vo formate xades epes
-- zavolať podpisovač a jedným podpisom podpísať
-  - https://www.slovensko.sk/sk/na-stiahnutie/informacie-pre-integratorov-ap časť D.Bridge JS, v1.x, pozrieť Integračná príručka D.Bridge JS, v1.x a v nej
-    - str.13 objekt ditec.dSigXadesJs
-    - metódy addXmlObject2, addPdfObject, sign/sign11/sign20
-  - detail parametrov metód popísaný v časti Dokumentácia pre integrátorov klientskych aplikácií pre KEP balíka D.Suite/eIDAS
-- uložiť výstup z podpisovača do súboru s xml koncovkou
-  - xades podpis vo formate xades epes
-    - metóda getSignedXmlWithEnvelope
+# 3.zadanie - casova peciatka
+- nové tlačidlo – prevod EPES na **T formu**
+  - Vstup – pôvodný podpis XAdES EPES
+  - Výstup – rozšírený podpis o časovú pečiatku XAdES T uložený v novom súbore
+- Tipy
+  - inšpirovať sa/použiť kód zo Sample priečinka (`sipvs-be/src/main/resources/sample-zadanie3`)
+  - pri manipulácii s XML nastaviť nástroje (parser), aby **NEmodifikoval** pôvodný obsah
+  - dôkladne si preštudovať profil
+    - identifikácia čo sa pečiatkuje

@@ -1,14 +1,17 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<libraryLoan xmlns="http://library.com/loan" loan_id="X123456">
-    <librarianId>1</librarianId>
+<libraryLoan xmlns="http://library.com/loan" loan_id="L000002">
+    <librarianId>2</librarianId>
     <borrower>
-        <cardNumber>ABC1DEF</cardNumber>
+        <cardNumber>AAABBBC</cardNumber>
     </borrower>
-    <dateOfLoan>2023-10-18</dateOfLoan>
-    <dueDate>2023-10-25</dueDate>
+    <dateOfLoan>2023-10-05</dateOfLoan>
+    <dueDate>2023-11-05</dueDate>
     <borrowedBooks>
         <book>
-            <isbn>0123456789</isbn>
+            <isbn>9780451524935</isbn>
+        </book>
+        <book>
+            <isbn>9780486282114</isbn>
         </book>
     </borrowedBooks>
 </libraryLoan>

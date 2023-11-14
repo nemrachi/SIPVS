@@ -2,7 +2,7 @@ package fiit.stulib.sipvsbe.service;
 
 public interface ITimestampService {
 
-    String getTimestamp();
+    String createTimestamp(String signedXML);
 
-    String addTimestampToDocument();
+    String createStamped(String xml, String stamp);
 }

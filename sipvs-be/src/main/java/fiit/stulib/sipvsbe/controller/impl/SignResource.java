@@ -5,8 +5,6 @@ import fiit.stulib.sipvsbe.service.ISignService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.util.StreamUtils;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -31,16 +29,6 @@ public class SignResource implements ISignResource {
             throw new RuntimeException(e);
         }
         return Base64.getEncoder().encodeToString(pdfBytes);
-    }
-
-    @Override
-    public ResponseEntity<String> sign() {
-        try {
-            return ResponseEntity.ok(signService.sign());
-        } catch (RuntimeException e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body("Sign error: " + e.getMessage());
-        }
     }
 
     @Override

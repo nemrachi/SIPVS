@@ -6,8 +6,6 @@ public interface ISignService {
 
     FileSystemResource createPdfFromXml();
 
-    String sign();
-
     String getXml();
 
     String getXsd();

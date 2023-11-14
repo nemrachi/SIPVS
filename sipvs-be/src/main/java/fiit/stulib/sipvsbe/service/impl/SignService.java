@@ -53,12 +53,6 @@ public class SignService implements ISignService {
     }
 
     @Override
-    public String sign() {
-        // toto este neviem co naco bude
-        return null;
-    }
-
-    @Override
     public String getXml() {
         return readFile(AppConfig.XML);
     }

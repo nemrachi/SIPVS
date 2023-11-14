@@ -8,8 +8,6 @@ import org.springframework.core.io.Resource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.StreamUtils;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.io.IOException;
@@ -17,13 +15,11 @@ import java.util.Base64;
 
 @Slf4j
 @RestController
-@RequestMapping("/api/zadanie2")
 public class SignResource implements ISignResource {
 
     @Autowired
     private ISignService signService;
 
-    @GetMapping("/generatePdfFromXml")
     @Override
     public String generatePdfFromXml() {
         Resource pdfFile = signService.createPdfFromXml();
@@ -37,8 +33,6 @@ public class SignResource implements ISignResource {
         return Base64.getEncoder().encodeToString(pdfBytes);
     }
 
-
-    @GetMapping(path = "/sign", produces = "application/pdf")
     @Override
     public ResponseEntity<String> sign() {
         try {
@@ -49,19 +43,16 @@ public class SignResource implements ISignResource {
         }
     }
 
-    @GetMapping(path = "/getxml", produces = "application/xml")
     @Override
     public String getXml() {
         return signService.getXml();
     }
 
-    @GetMapping(path = "/getxsd", produces = "application/xml")
     @Override
     public String getXsd() {
         return signService.getXsd();
     }
 
-    @GetMapping(path = "/getxsl", produces = "application/xml")
     @Override
     public String getXsl() {
         return signService.getXsl();

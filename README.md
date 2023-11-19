@@ -91,7 +91,7 @@ Example error output:
 Status 500
 ```
 
-## GET: http://localhost:8080/api/zadanie1/sign
+## GET: http://localhost:8080/api/zadanie2/getxml
 
 Example input:
 ```
@@ -99,14 +99,98 @@ N/A
 ```
 Example output:
 ```
-XML response
+XML content
 ```
 ```
 Status 200
 ```
 Example error output:
 ```
-"Sign error: [error message]"
+?
+```
+```
+Status 500
+```
+
+## GET: http://localhost:8080/api/zadanie2/getxsd
+
+Example input:
+```
+N/A
+```
+Example output:
+```
+XSD content
+```
+```
+Status 200
+```
+Example error output:
+```
+?
+```
+```
+Status 500
+```
+
+## GET: http://localhost:8080/api/zadanie2/getxsl
+
+Example input:
+```
+N/A
+```
+Example output:
+```
+XSL content
+```
+```
+Status 200
+```
+Example error output:
+```
+?
+```
+```
+Status 500
+```
+
+## GET: http://localhost:8080/api/zadanie2/generatePdfFromXml
+
+Example input:
+```
+N/A
+```
+Example output:
+```
+PDF content
+```
+```
+Status 200
+```
+Example error output:
+```
+?
+```
+```
+Status 500
+```
+
+## GET: http://localhost:8080/api/zadanie3/timestamp
+
+Example input:
+```
+N/A
+```
+Example output:
+```
+XML response?
+```
+```
+Status 200
+```
+Example error output:
+```
+?
 ```
 ```
 Status 500

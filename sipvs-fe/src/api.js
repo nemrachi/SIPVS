@@ -20,6 +20,7 @@ export const transformData = async () => {
     alert(error.response.data);
   }
 };
+
 export const getXSD = async () => {
   try {
     const response = await axios.get("/api/zadanie2/getxsd");
@@ -84,6 +85,15 @@ export const confirmData = async (loan) => {
     // a.click();
     //
     // window.URL.revokeObjectURL(url);
+  } catch (error) {
+    alert(error.response.data);
+  }
+};
+
+export const getTimestamp = async () => {
+  try {
+    const response = await axios.get("/api/zadanie3/timestamp");
+    alert(response.data);
   } catch (error) {
     alert(error.response.data);
   }

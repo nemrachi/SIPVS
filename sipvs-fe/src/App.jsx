@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { validateData, transformData, confirmData } from "./api";
+import { validateData, transformData, confirmData, getTimestamp } from "./api";
 
 import SignComponent from "./SignComponent";
 
@@ -223,9 +223,20 @@ function App() {
         >
           Transform data
         </button>
-        <button type="button" className="button-gray" onClick={handleSign}>
+        <button 
+          className="button-gray"
+          type="button"
+          onClick={handleSign}
+        >
           Sign data
         </button>
+        <button 
+          className="button-gray"
+          type="button"
+          onClick={getTimestamp}
+        >
+          Timestamp
+        </button> {/* prevod EPES na T formu */}
       </form>
     </main>
   );

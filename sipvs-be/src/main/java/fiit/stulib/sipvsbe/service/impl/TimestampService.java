@@ -20,12 +20,12 @@ import java.util.Base64;
 @Slf4j
 public class TimestampService implements ITimestampService {
 
-    private static final String initMatch = "<ds:SignatureValue Id=\"signatureIdSignatureValue\" xmlns:ds=\"http://www.w3.org/2000/09/xmldsig#\" xmlns:xzep=\"http://www.ditec.sk/ep/signature_formats/xades_zep/v1.1\">";
-    private static final String lastMatch = "</ds:SignatureValue>";
+    private static final String initSignatureMatch = "<ds:SignatureValue Id=\"signatureIdSignatureValue\" xmlns:ds=\"http://www.w3.org/2000/09/xmldsig#\" xmlns:xzep=\"http://www.ditec.sk/ep/signature_formats/xades_zep/v1.1\">";
+    private static final String lastSignatureMatch = "</ds:SignatureValue>";
     private static final String magicMatch = "</xades:SignedProperties>";
     private static final String magicPrefix = "<xades:UnsignedProperties><xades:UnsignedSignatureProperties><xades:SignatureTimeStamp Id=\"signatureIdSignatureTimeStamp\"><xades:EncapsulatedTimeStamp>";
     private static final String magicPostfix = "</xades:EncapsulatedTimeStamp></xades:SignatureTimeStamp></xades:UnsignedSignatureProperties></xades:UnsignedProperties>";
-    private static final int initOffset = initMatch.length();
+    private static final int initSignatureOffset = initSignatureMatch.length();
     private static final int magicOffset = magicMatch.length();
 
     @Override
@@ -36,7 +36,7 @@ public class TimestampService implements ITimestampService {
 
         byte[] signatureDigest;
 
-        String base64signature = xmlString.substring(xmlString.indexOf(initMatch) + initOffset, xmlString.indexOf(lastMatch));
+        String base64signature = xmlString.substring(xmlString.indexOf(initSignatureMatch) + initSignatureOffset, xmlString.indexOf(lastSignatureMatch));
 
         Digest digest = new SHA256Digest();
         digest.update(base64signature.getBytes(), 0, base64signature.length());

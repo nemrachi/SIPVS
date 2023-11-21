@@ -71,36 +71,54 @@ public class TimestampService implements ITimestampService {
     private static byte[] getTimestamp(byte[] tsRequest) {
         try {
             URL url = new URL(AppConfig.TIMESTAMP_SERVER);
-            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-            connection.setRequestMethod("POST");
-            connection.setRequestProperty("Content-Type", "application/timestamp-query");
-            connection.setDoOutput(true);
+            HttpURLConnection connection = openConnection(url);
 
-            try (OutputStream outputStream = connection.getOutputStream()) {
-                outputStream.write(tsRequest);
-            }
+            sendTimestampRequest(connection, tsRequest);
 
-            if (HttpURLConnection.HTTP_OK == connection.getResponseCode()) {
-                String contentType = connection.getContentType();
+            handleResponse(connection);
 
-                if (contentType != null && contentType.equalsIgnoreCase("application/timestamp-reply")) {
+            return readResponseBody(connection);
+        } catch (IOException e) {
+            throw new RuntimeException("Error while getting timestamp: " + e.getMessage(), e);
+        }
+    }
 
-                    try (InputStream inputStream = connection.getInputStream(); ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream()) {
-                        byte[] buffer = new byte[1024];
-                        int bytesRead;
-                        while ((bytesRead = inputStream.read(buffer)) != -1) {
-                            byteArrayOutputStream.write(buffer, 0, bytesRead);
-                        }
-                        return byteArrayOutputStream.toByteArray();
-                    }
-                } else {
-                    throw new Exception("Incorrect response: " + contentType);
-                }
+    private static HttpURLConnection openConnection(URL url) throws IOException {
+        HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+        connection.setRequestMethod("POST");
+        connection.setRequestProperty("Content-Type", "application/timestamp-query");
+        connection.setDoOutput(true);
+        return connection;
+    }
+
+    private static void sendTimestampRequest(HttpURLConnection connection, byte[] tsRequest) throws IOException {
+        try (OutputStream outputStream = connection.getOutputStream()) {
+            outputStream.write(tsRequest);
+        }
+    }
+
+    private static void handleResponse(HttpURLConnection connection) throws IOException {
+        if (HttpURLConnection.HTTP_OK == connection.getResponseCode()) {
+            String contentType = connection.getContentType();
+
+            if (contentType != null && contentType.equalsIgnoreCase("application/timestamp-reply")) {
+                return;
             } else {
-                throw new Exception("HTTP error code: " + connection.getResponseCode());
+                throw new IOException("Incorrect response: " + contentType);
             }
-        } catch (Exception e) {
-            throw new RuntimeException(e.getMessage());
+        } else {
+            throw new IOException("HTTP error code: " + connection.getResponseCode());
+        }
+    }
+
+    private static byte[] readResponseBody(HttpURLConnection connection) throws IOException {
+        try (InputStream inputStream = connection.getInputStream(); ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream()) {
+            byte[] buffer = new byte[1024];
+            int bytesRead;
+            while ((bytesRead = inputStream.read(buffer)) != -1) {
+                byteArrayOutputStream.write(buffer, 0, bytesRead);
+            }
+            return byteArrayOutputStream.toByteArray();
         }
     }
 

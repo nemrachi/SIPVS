@@ -90,11 +90,18 @@ export const confirmData = async (loan) => {
   }
 };
 
-export const getTimestamp = async () => {
-  try {
-    const response = await axios.get("/api/zadanie3/timestamp");
-    alert(response.data);
-  } catch (error) {
-    alert(error.response.data);
-  }
+
+export const uploadFile = async (formData) => {
+  axios
+    .post("/api/zadanie3/timestamp", formData, {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+    })
+    .then((response) => {
+      console.log("Upload successful:", response.data);
+    })
+    .catch((error) => {
+      console.error("Error uploading file:", error);
+    });
 };

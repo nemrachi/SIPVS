@@ -1,5 +1,10 @@
 import React, { useState } from "react";
-import { validateData, transformData, confirmData, getTimestamp } from "./api";
+import {
+  validateData,
+  transformData,
+  confirmData,
+  uploadFile,
+} from "./api";
 
 import SignComponent from "./SignComponent";
 
@@ -15,6 +20,8 @@ function App() {
     loanedBooks: [{ isbn: "" }],
   };
   const [loan, setLoan] = useState(EMPTY_LOAN);
+  const [selectedFile, setSelectedFile] = useState(null);
+
   const handleChange = (e, nested) => {
     const value = e.target.value;
     if (nested) {
@@ -57,6 +64,21 @@ function App() {
       resetLoan();
     });
     console.log(loan);
+  };
+
+  const handleFileChange = (event) => {
+    setSelectedFile(event.target.files[0]);
+  };
+
+  const handleUpload = () => {
+    if (selectedFile) {
+      const formData = new FormData();
+      formData.append("file", selectedFile);
+
+      uploadFile(formData).then((r) => console.log(r));
+    } else {
+      console.log("No file selected");
+    }
   };
 
   const handleSign = () => {
@@ -223,20 +245,15 @@ function App() {
         >
           Transform data
         </button>
-        <button 
-          className="button-gray"
-          type="button"
-          onClick={handleSign}
-        >
+        <button className="button-gray" type="button" onClick={handleSign}>
           Sign data
         </button>
-        <button 
-          className="button-gray"
-          type="button"
-          onClick={getTimestamp}
-        >
-          Timestamp
-        </button> {/* prevod EPES na T formu */}
+        <div>
+          <input type="file" onChange={handleFileChange} />
+          <button className="button-gray" onClick={handleUpload}>
+            Upload
+          </button>
+        </div>
       </form>
     </main>
   );

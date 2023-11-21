@@ -20,13 +20,13 @@ import java.util.Base64;
 @Slf4j
 public class TimestampService implements ITimestampService {
 
-    private String initMatch = "<ds:SignatureValue Id=\"signatureIdSignatureValue\" xmlns:ds=\"http://www.w3.org/2000/09/xmldsig#\" xmlns:xzep=\"http://www.ditec.sk/ep/signature_formats/xades_zep/v1.1\">";
-    private int initOffset = initMatch.length();
-    private String lastMatch = "</ds:SignatureValue>";
-    private String funnyMatch = "</xades:SignedProperties>";
-    private int funnyOffset = funnyMatch.length();
-    private String funnyPre = "<xades:UnsignedProperties><xades:UnsignedSignatureProperties><xades:SignatureTimeStamp Id=\"signatureIdSignatureTimeStamp\"><xades:EncapsulatedTimeStamp>";
-    private String funnyPost = "</xades:EncapsulatedTimeStamp></xades:SignatureTimeStamp></xades:UnsignedSignatureProperties></xades:UnsignedProperties>";
+    private static final String initMatch = "<ds:SignatureValue Id=\"signatureIdSignatureValue\" xmlns:ds=\"http://www.w3.org/2000/09/xmldsig#\" xmlns:xzep=\"http://www.ditec.sk/ep/signature_formats/xades_zep/v1.1\">";
+    private static final int initOffset = initMatch.length();
+    private static final String lastMatch = "</ds:SignatureValue>";
+    private static final String magicMatch = "</xades:SignedProperties>";
+    private static final int magicOffset = magicMatch.length();
+    private static final String magicPrefix = "<xades:UnsignedProperties><xades:UnsignedSignatureProperties><xades:SignatureTimeStamp Id=\"signatureIdSignatureTimeStamp\"><xades:EncapsulatedTimeStamp>";
+    private static final String magicPostfix = "</xades:EncapsulatedTimeStamp></xades:SignatureTimeStamp></xades:UnsignedSignatureProperties></xades:UnsignedProperties>";
 
     @Override
     public String createTimestamp(String xmlString) {
@@ -40,7 +40,7 @@ public class TimestampService implements ITimestampService {
         byte[] signatureDigest;
 
         if (true) {
-            String base64signature = xmlString.substring(xmlString.indexOf(this.initMatch) + this.initOffset, xmlString.indexOf(this.lastMatch));
+            String base64signature = xmlString.substring(xmlString.indexOf(initMatch) + initOffset, xmlString.indexOf(lastMatch));
 
             Digest digest = new SHA256Digest();
             digest.update(base64signature.getBytes(), 0, base64signature.length());
@@ -49,7 +49,7 @@ public class TimestampService implements ITimestampService {
             int outOff = 0;
             digest.doFinal(signatureDigest, outOff);
         } else if (false) {
-            signatureDigest = xmlString.substring(xmlString.indexOf(this.initMatch) + this.initOffset, xmlString.indexOf(this.lastMatch)).getBytes();
+            signatureDigest = xmlString.substring(xmlString.indexOf(initMatch) + initOffset, xmlString.indexOf(lastMatch)).getBytes();
         } else {
             Digest digest = new SHA256Digest();
             digest.update(xmlString.getBytes(), 0, xmlString.length());
@@ -79,12 +79,12 @@ public class TimestampService implements ITimestampService {
             String timestampB64 = Base64.getEncoder().encodeToString(tsResponse.getTimeStampToken().getEncoded());
 
             // pridanie XADES-T do XADES-EPES
-            int funny = xmlString.indexOf(this.funnyMatch);
-            String updated = xmlString.substring(0, funny + this.funnyOffset);
-            updated += this.funnyPre;
+            int funny = xmlString.indexOf(magicMatch);
+            String updated = xmlString.substring(0, funny + magicOffset);
+            updated += magicPrefix;
             updated += timestampB64;
-            updated += this.funnyPost;
-            updated += xmlString.substring(funny + this.funnyOffset);
+            updated += magicPostfix;
+            updated += xmlString.substring(funny + magicOffset);
 
             return updated;
         } catch (IOException | TSPException e) {

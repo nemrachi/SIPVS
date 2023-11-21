@@ -1,9 +1,7 @@
 package fiit.stulib.sipvsbe.controller;
 
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.constraints.NotNull;
 
@@ -12,5 +10,5 @@ import javax.validation.constraints.NotNull;
 public interface ITimestampResource {
 
     @PostMapping(path = "/timestamp", produces = "application/xml", consumes = "application/xml")
-    String addTimestamp(@RequestBody @NotNull String signedXml);
+    String addTimestamp(@RequestParam("file") MultipartFile file);
 }

@@ -21,12 +21,12 @@ import java.util.Base64;
 public class TimestampService implements ITimestampService {
 
     private static final String initMatch = "<ds:SignatureValue Id=\"signatureIdSignatureValue\" xmlns:ds=\"http://www.w3.org/2000/09/xmldsig#\" xmlns:xzep=\"http://www.ditec.sk/ep/signature_formats/xades_zep/v1.1\">";
-    private static final int initOffset = initMatch.length();
     private static final String lastMatch = "</ds:SignatureValue>";
     private static final String magicMatch = "</xades:SignedProperties>";
-    private static final int magicOffset = magicMatch.length();
     private static final String magicPrefix = "<xades:UnsignedProperties><xades:UnsignedSignatureProperties><xades:SignatureTimeStamp Id=\"signatureIdSignatureTimeStamp\"><xades:EncapsulatedTimeStamp>";
     private static final String magicPostfix = "</xades:EncapsulatedTimeStamp></xades:SignatureTimeStamp></xades:UnsignedSignatureProperties></xades:UnsignedProperties>";
+    private static final int initOffset = initMatch.length();
+    private static final int magicOffset = magicMatch.length();
 
     @Override
     public String createTimestamp(String xmlString) {
@@ -104,6 +104,7 @@ public class TimestampService implements ITimestampService {
         }
     }
 
+    // vždy som si chcel vyskúšať takéto retardovane pomenovanie
     private static String doMagic(String xmlString, String timestampB64) {
         int magicIndex = xmlString.indexOf(magicMatch);
         if (magicIndex != -1) {

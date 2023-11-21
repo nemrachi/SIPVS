@@ -107,13 +107,11 @@ public class TimestampService implements ITimestampService {
     private static String doMagic(String xmlString, String timestampB64) {
         int magicIndex = xmlString.indexOf(magicMatch);
         if (magicIndex != -1) {
-            StringBuilder updatedXml = new StringBuilder(xmlString.length() + magicPrefix.length() + timestampB64.length() + magicPostfix.length());
-            updatedXml.append(xmlString, 0, magicIndex + magicOffset);
-            updatedXml.append(magicPrefix);
-            updatedXml.append(timestampB64);
-            updatedXml.append(magicPostfix);
-            updatedXml.append(xmlString, magicIndex + magicOffset, xmlString.length());
-            return updatedXml.toString();
+            return xmlString.substring(0, magicIndex + magicOffset) +
+                    magicPrefix +
+                    timestampB64 +
+                    magicPostfix +
+                    xmlString.substring(magicIndex + magicOffset);
         } else {
             log.error("Error: magicMatch not found in the XML string.");
         }

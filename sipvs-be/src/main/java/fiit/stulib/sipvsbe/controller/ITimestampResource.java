@@ -9,6 +9,6 @@ import javax.validation.constraints.NotNull;
 @RestController
 public interface ITimestampResource {
 
-    @PostMapping(path = "/timestamp", produces = "application/xml", consumes = "application/xml")
+    @PostMapping(path = "/timestamp", produces = "application/xml")
     String addTimestamp(@RequestParam("file") MultipartFile file);
 }

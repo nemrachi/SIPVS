@@ -248,13 +248,13 @@ function App() {
         <button className="button-gray" type="button" onClick={handleSign}>
           Sign data
         </button>
-        <div>
+      </form>
+      <div>
           <input type="file" onChange={handleFileChange} />
           <button className="button-gray" onClick={handleUpload}>
             Upload
           </button>
         </div>
-      </form>
     </main>
   );
 }

@@ -9,6 +9,6 @@ public class AppConfig {
     public static final String XML = "src/main/resources/out/result.xml";
     public static final String PDF = "src/main/resources/out/result.pdf";
 
-    public static final String TIMESTAMP_SERVER = "https://test.ditec.sk/TSAServer/tsa.aspx";
+    public static final String TIMESTAMP_SERVER = "http://test.ditec.sk/TSAServer/tsa.aspx";
     public static final String SSL = "src/main/resources/static/dtcca.cer";
 }

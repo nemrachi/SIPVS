@@ -2,50 +2,41 @@ package fiit.stulib.sipvsbe.service.impl.util;
 
 import fiit.stulib.sipvsbe.service.AppConfig;
 
-import javax.net.ssl.HttpsURLConnection;
-import javax.net.ssl.SSLContext;
-import javax.net.ssl.TrustManagerFactory;
 import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.security.KeyStore;
 import java.security.cert.Certificate;
 import java.security.cert.CertificateFactory;
 
-import java.net.URL;
-
 public class SSLHelper {
 
-    public static HttpsURLConnection createHttpsURLConnection(String url) throws Exception {
-        // Set up the SSLContext
-        SSLContext sslContext = getSSLContext();
+    public static void addCertificateToTruststore(String truststorePath, String truststorePassword) {
+        try {
+            // Load the existing truststore
+            KeyStore truststore = KeyStore.getInstance(KeyStore.getDefaultType());
+            try (InputStream truststoreStream = new FileInputStream(truststorePath)) {
+                truststore.load(truststoreStream, truststorePassword.toCharArray());
+            }
 
-        // Set up the HttpsURLConnection with the custom SSLContext
-        URL serverURL = new URL(url);
-        HttpsURLConnection connection = (HttpsURLConnection) serverURL.openConnection();
-        connection.setSSLSocketFactory(sslContext.getSocketFactory());
+            // Load the certificate
+            Certificate certificate;
+            try (InputStream certificateStream = new FileInputStream(AppConfig.SSL)) {
+                certificate = CertificateFactory.getInstance("X.509").generateCertificate(certificateStream);
+            }
 
-        return connection;
+            // Add the certificate to the truststore
+            truststore.setCertificateEntry("sipvs_inuqe", certificate);
+
+            // Save the updated truststore
+            try (OutputStream truststoreOutputStream = new FileOutputStream(truststorePath)) {
+                truststore.store(truststoreOutputStream, truststorePassword.toCharArray());
+            }
+
+            System.out.println("Certificate added to the truststore successfully.");
+        } catch (Exception e) {
+            throw new RuntimeException("Error adding certificate to the truststore", e);
+        }
     }
-
-    private static SSLContext getSSLContext() throws Exception {
-        // Load your custom certificate
-        CertificateFactory cf = CertificateFactory.getInstance("X.509");
-        FileInputStream fis = new FileInputStream(AppConfig.SSL);
-        Certificate cert = cf.generateCertificate(fis);
-
-        // Create a KeyStore and add the custom certificate
-        KeyStore keyStore = KeyStore.getInstance(KeyStore.getDefaultType());
-        keyStore.load(null, null);
-        keyStore.setCertificateEntry("dtcca", cert);
-
-        // Create a TrustManager that trusts the custom certificate
-        TrustManagerFactory tmf = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
-        tmf.init(keyStore);
-
-        // Create an SSL context with the custom TrustManager
-        SSLContext sslContext = SSLContext.getInstance("TLS");
-        sslContext.init(null, tmf.getTrustManagers(), null);
-
-        return sslContext;
-    }
-
 }

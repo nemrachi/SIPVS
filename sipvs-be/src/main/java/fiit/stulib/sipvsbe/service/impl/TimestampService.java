@@ -2,135 +2,130 @@ package fiit.stulib.sipvsbe.service.impl;
 
 import fiit.stulib.sipvsbe.service.AppConfig;
 import fiit.stulib.sipvsbe.service.ITimestampService;
-import fiit.stulib.sipvsbe.service.impl.util.SSLHelper;
 import lombok.extern.slf4j.Slf4j;
-import org.bouncycastle.tsp.TSPException;
-import org.bouncycastle.tsp.TimeStampResponse;
-import org.bouncycastle.tsp.TimeStampToken;
-import org.bouncycastle.util.encoders.Base64;
+import org.bouncycastle.crypto.Digest;
+import org.bouncycastle.crypto.digests.SHA256Digest;
+import org.bouncycastle.tsp.*;
 import org.springframework.stereotype.Service;
-import org.yaml.snakeyaml.external.biz.base64Coder.Base64Coder;
 
-import javax.net.ssl.HttpsURLConnection;
-import java.io.*;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.util.Base64;
 
 @Service
 @Slf4j
 public class TimestampService implements ITimestampService {
 
-    @Override
-    public String createTimestamp(String signedXML) {
-        String timestamp = null;
+    private String initMatch = "<ds:SignatureValue Id=\"signatureIdSignatureValue\" xmlns:ds=\"http://www.w3.org/2000/09/xmldsig#\" xmlns:xzep=\"http://www.ditec.sk/ep/signature_formats/xades_zep/v1.1\">";
+    private int initOffset = initMatch.length();
+    private String lastMatch = "</ds:SignatureValue>";
+    private String funnyMatch = "</xades:SignedProperties>";
+    private int funnyOffset = funnyMatch.length();
+    private String funnyPre = "<xades:UnsignedProperties><xades:UnsignedSignatureProperties><xades:SignatureTimeStamp Id=\"signatureIdSignatureTimeStamp\"><xades:EncapsulatedTimeStamp>";
+    private String funnyPost = "</xades:EncapsulatedTimeStamp></xades:SignatureTimeStamp></xades:UnsignedSignatureProperties></xades:UnsignedProperties>";
 
+    @Override
+    public String createTimestamp(String xmlString) {
+
+        //String truststorePath = "C:\\Program Files\\Java\\jre1.8.0_181\\lib\\security\\cacerts";
+        //String truststorePassword = "changeit";
+        //SSLHelper.addCertificateToTruststore(truststorePath, truststorePassword);
+
+        log.info("createTimestamp: {}", xmlString);
+
+        byte[] signatureDigest;
+
+        if (true) {
+            String base64signature = xmlString.substring(xmlString.indexOf(this.initMatch) + this.initOffset, xmlString.indexOf(this.lastMatch));
+
+            Digest digest = new SHA256Digest();
+            digest.update(base64signature.getBytes(), 0, base64signature.length());
+
+            signatureDigest = new byte[digest.getDigestSize()];
+            int outOff = 0;
+            digest.doFinal(signatureDigest, outOff);
+        } else if (false) {
+            signatureDigest = xmlString.substring(xmlString.indexOf(this.initMatch) + this.initOffset, xmlString.indexOf(this.lastMatch)).getBytes();
+        } else {
+            Digest digest = new SHA256Digest();
+            digest.update(xmlString.getBytes(), 0, xmlString.length());
+
+            signatureDigest = new byte[digest.getDigestSize()];
+            int outOff = 0;
+            digest.doFinal(signatureDigest, outOff);
+        }
+
+        TimeStampRequestGenerator tsRequestGenerator = new TimeStampRequestGenerator();
+        tsRequestGenerator.setCertReq(true);
+
+        TimeStampRequest tsRequest = tsRequestGenerator.generate(TSPAlgorithms.SHA256, signatureDigest);
+
+
+        return createStamped(tsRequest, xmlString);
+
+    }
+
+    @Override
+    public String createStamped(TimeStampRequest tsRequest, String xmlString) {
         try {
-            timestamp = getTimestampFromRemote(signedXML);
+            byte[] responseBytes = getTimestamp(tsRequest.getEncoded());
+
+            TimeStampResponse tsResponse = new TimeStampResponse(responseBytes);
+            // extrahovanie podpisanych dat a casovej peciatky
+            String timestampB64 = Base64.getEncoder().encodeToString(tsResponse.getTimeStampToken().getEncoded());
+
+            // pridanie XADES-T do XADES-EPES
+            int funny = xmlString.indexOf(this.funnyMatch);
+            String updated = xmlString.substring(0, funny + this.funnyOffset);
+            updated += this.funnyPre;
+            updated += timestampB64;
+            updated += this.funnyPost;
+            updated += xmlString.substring(funny + this.funnyOffset);
+
+            return updated;
         } catch (IOException | TSPException e) {
-            throw new RuntimeException(e);
+            throw new RuntimeException(e.getMessage());
         }
-
-        if (timestamp == null) {
-            throw new RuntimeException("Nepodarilo sa pridať časovú pečiatku");
-        } else {
-            log.info(timestamp);
-            return timestamp;
-        }
-
     }
 
-    @Override
-    public String createStamped(String xml, String stamp) {
-        String stamped = "";
-        int i = xml.lastIndexOf("</xades:SignedProperties>");
-        stamped = xml.substring(0, i + 25);
-        stamped += "<xades:UnsignedProperties>";
-        stamped += "<xades:UnsignedSignatureProperties>";
-        stamped += "<xades:SignatureTimeStamp Id=\"signatureIdSignatureTimeStamp\">";
-        stamped += "<xades:EncapsulatedTimeStamp>";
-        stamped += stamp;
-        stamped += "</xades:EncapsulatedTimeStamp>";
-        stamped += "</xades:SignatureTimeStamp>";
-        stamped += "</xades:UnsignedSignatureProperties>";
-        stamped += "</xades:UnsignedProperties>";
-        stamped += xml.substring(i + 25);
-        return stamped;
-    }
-
-    private static String getTimestampFromRemote(String signWrapper) throws IOException, TSPException {
-
-        String startMarker = "<ds:SignatureValue Id=\"signatureIdSignatureValue\">";
-        String endMarker = "</ds:SignatureValue>";
-
-        int startIndex = signWrapper.indexOf(startMarker) + startMarker.length();
-        int endIndex = signWrapper.indexOf(endMarker, startIndex);
-
-        if (startIndex >= 0 && endIndex >= 0) {
-            signWrapper = signWrapper.substring(startIndex, endIndex);
-        } else {
-            throw new RuntimeException("Nie je možné čítať podpis");
-        }
-
-
+    private byte[] getTimestamp(byte[] tsRequest) {
         try {
-            HttpsURLConnection tsConnection = SSLHelper.createHttpsURLConnection(AppConfig.TIMESTAMP_SERVER);
+            URL url = new URL(AppConfig.TIMESTAMP_SERVER);
+            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+            connection.setRequestMethod("POST");
+            connection.setRequestProperty("Content-Type", "application/timestamp-query");
+            connection.setDoOutput(true);
 
-            tsConnection.setDoOutput(true);
-            tsConnection.setDoInput(true);
-            tsConnection.setRequestMethod("POST");
-            tsConnection.setRequestProperty("Content-Type", "text/xml; charset=utf-8");
-            tsConnection.setRequestProperty("SOAPAction", "http://www.ditec.sk/GetTimestamp");
-
-            OutputStream out = tsConnection.getOutputStream();
-            Writer wout = new OutputStreamWriter(out);
-            wout.write("<?xml version=\"1.0\" encoding=\"utf-8\"?>\n" +
-                    "<soap:Envelope xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" xmlns:soap=\"http://schemas.xmlsoap.org/soap/envelope/\">\n" +
-                    "  <soap:Body>\n" +
-                    "    <GetTimestamp xmlns=\"http://www.ditec.sk/\">\n" +
-                    "      <dataB64>" + Base64.toBase64String(signWrapper.getBytes()) + "</dataB64>\n" +
-                    "    </GetTimestamp>\n" +
-                    "  </soap:Body>\n" +
-                    "</soap:Envelope>"
-            );
-
-            wout.flush();
-            wout.close();
-
-            String response = getResponse(tsConnection);
-            tsConnection.disconnect();
-
-            try {
-                TimeStampResponse timeStampResponse = new TimeStampResponse(Base64.decode(response));
-                TimeStampToken timestampToken = timeStampResponse.getTimeStampToken();
-                return Base64Coder.encodeString(Base64Coder.encodeLines(timestampToken.getEncoded()));
-            } catch (TSPException e) {
-                log.error("TSPException: ", e);
-                throw e;
+            try (OutputStream outputStream = connection.getOutputStream()) {
+                outputStream.write(tsRequest);
             }
 
-        } catch (IOException | TSPException e) {
-            log.error("IOException: ", e);
-            throw e;
+            if (HttpURLConnection.HTTP_OK == connection.getResponseCode()) {
+                String contentType = connection.getContentType();
+
+                if (contentType != null && contentType.toLowerCase().equals("application/timestamp-reply")) {
+
+                    try (InputStream inputStream = connection.getInputStream(); ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream()) {
+                        byte[] buffer = new byte[1024];
+                        int bytesRead;
+                        while ((bytesRead = inputStream.read(buffer)) != -1) {
+                            byteArrayOutputStream.write(buffer, 0, bytesRead);
+                        }
+                        return byteArrayOutputStream.toByteArray();
+                    }
+                } else {
+                    throw new Exception("Incorrect response mimetype: " + contentType);
+                }
+            } else {
+                throw new Exception("HTTP error code: " + connection.getResponseCode());
+            }
         } catch (Exception e) {
-            throw new RuntimeException(e);
+            throw new RuntimeException(e.getMessage());
         }
-    }
-
-    private static String getResponse(HttpsURLConnection tsConnection) throws IOException {
-        InputStream inputStream = tsConnection.getInputStream();
-
-        int c;
-        StringBuilder responseBuilder = new StringBuilder();
-        while ((c = inputStream.read()) != -1) {
-            responseBuilder.append((char) c);
-        }
-
-        inputStream.close();
-        String response = responseBuilder.toString();
-
-        int i = response.indexOf("<GetTimestampResult>");
-        response = response.substring(i + 20);
-        i = response.indexOf("</GetTimestampResult>");
-        response = response.substring(0, i);
-        return response;
     }
 
 }

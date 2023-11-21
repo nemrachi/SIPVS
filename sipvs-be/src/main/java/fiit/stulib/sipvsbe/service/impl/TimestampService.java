@@ -30,43 +30,24 @@ public class TimestampService implements ITimestampService {
 
     @Override
     public String createTimestamp(String xmlString) {
-
         //String truststorePath = "C:\\Program Files\\Java\\jre1.8.0_181\\lib\\security\\cacerts";
         //String truststorePassword = "changeit";
         //SSLHelper.addCertificateToTruststore(truststorePath, truststorePassword);
 
-        log.info("createTimestamp: {}", xmlString);
-
         byte[] signatureDigest;
 
-        if (true) {
-            String base64signature = xmlString.substring(xmlString.indexOf(initMatch) + initOffset, xmlString.indexOf(lastMatch));
+        String base64signature = xmlString.substring(xmlString.indexOf(initMatch) + initOffset, xmlString.indexOf(lastMatch));
 
-            Digest digest = new SHA256Digest();
-            digest.update(base64signature.getBytes(), 0, base64signature.length());
-
-            signatureDigest = new byte[digest.getDigestSize()];
-            int outOff = 0;
-            digest.doFinal(signatureDigest, outOff);
-        } else if (false) {
-            signatureDigest = xmlString.substring(xmlString.indexOf(initMatch) + initOffset, xmlString.indexOf(lastMatch)).getBytes();
-        } else {
-            Digest digest = new SHA256Digest();
-            digest.update(xmlString.getBytes(), 0, xmlString.length());
-
-            signatureDigest = new byte[digest.getDigestSize()];
-            int outOff = 0;
-            digest.doFinal(signatureDigest, outOff);
-        }
+        Digest digest = new SHA256Digest();
+        digest.update(base64signature.getBytes(), 0, base64signature.length());
+        signatureDigest = new byte[digest.getDigestSize()];
+        digest.doFinal(signatureDigest, 0);
 
         TimeStampRequestGenerator tsRequestGenerator = new TimeStampRequestGenerator();
         tsRequestGenerator.setCertReq(true);
-
         TimeStampRequest tsRequest = tsRequestGenerator.generate(TSPAlgorithms.SHA256, signatureDigest);
 
-
         return createStamped(tsRequest, xmlString);
-
     }
 
     @Override
@@ -75,24 +56,19 @@ public class TimestampService implements ITimestampService {
             byte[] responseBytes = getTimestamp(tsRequest.getEncoded());
 
             TimeStampResponse tsResponse = new TimeStampResponse(responseBytes);
-            // extrahovanie podpisanych dat a casovej peciatky
             String timestampB64 = Base64.getEncoder().encodeToString(tsResponse.getTimeStampToken().getEncoded());
 
-            // pridanie XADES-T do XADES-EPES
-            int funny = xmlString.indexOf(magicMatch);
-            String updated = xmlString.substring(0, funny + magicOffset);
-            updated += magicPrefix;
-            updated += timestampB64;
-            updated += magicPostfix;
-            updated += xmlString.substring(funny + magicOffset);
+            // Adding XADES-T to XADES-EPES
+            String updatedXml = doMagic(xmlString, timestampB64);
+            if (updatedXml != null) return updatedXml;
 
-            return updated;
         } catch (IOException | TSPException e) {
             throw new RuntimeException(e.getMessage());
         }
+        return null;
     }
 
-    private byte[] getTimestamp(byte[] tsRequest) {
+    private static byte[] getTimestamp(byte[] tsRequest) {
         try {
             URL url = new URL(AppConfig.TIMESTAMP_SERVER);
             HttpURLConnection connection = (HttpURLConnection) url.openConnection();
@@ -107,7 +83,7 @@ public class TimestampService implements ITimestampService {
             if (HttpURLConnection.HTTP_OK == connection.getResponseCode()) {
                 String contentType = connection.getContentType();
 
-                if (contentType != null && contentType.toLowerCase().equals("application/timestamp-reply")) {
+                if (contentType != null && contentType.equalsIgnoreCase("application/timestamp-reply")) {
 
                     try (InputStream inputStream = connection.getInputStream(); ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream()) {
                         byte[] buffer = new byte[1024];
@@ -118,7 +94,7 @@ public class TimestampService implements ITimestampService {
                         return byteArrayOutputStream.toByteArray();
                     }
                 } else {
-                    throw new Exception("Incorrect response mimetype: " + contentType);
+                    throw new Exception("Incorrect response: " + contentType);
                 }
             } else {
                 throw new Exception("HTTP error code: " + connection.getResponseCode());
@@ -126,6 +102,22 @@ public class TimestampService implements ITimestampService {
         } catch (Exception e) {
             throw new RuntimeException(e.getMessage());
         }
+    }
+
+    private static String doMagic(String xmlString, String timestampB64) {
+        int magicIndex = xmlString.indexOf(magicMatch);
+        if (magicIndex != -1) {
+            StringBuilder updatedXml = new StringBuilder(xmlString.length() + magicPrefix.length() + timestampB64.length() + magicPostfix.length());
+            updatedXml.append(xmlString, 0, magicIndex + magicOffset);
+            updatedXml.append(magicPrefix);
+            updatedXml.append(timestampB64);
+            updatedXml.append(magicPostfix);
+            updatedXml.append(xmlString, magicIndex + magicOffset, xmlString.length());
+            return updatedXml.toString();
+        } else {
+            log.error("Error: magicMatch not found in the XML string.");
+        }
+        return null;
     }
 
 }

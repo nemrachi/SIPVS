@@ -210,6 +210,10 @@ npm install
 npm run dev
 ```
 
+## Poznamky z cviceni su dostupne tu:
+https://docs.google.com/document/d/10XnzfjOgmgRS6fMJsDnlVr5NHXX6PPExP4UaDWbwFIY/edit?usp=sharing
+
+
 ## Podpisovac navod
 
 - stiahnut a nainstalovat D.Lanucher v2.x
@@ -218,7 +222,7 @@ npm run dev
 - **? ako to spojazdnit ?**
 
 ---
-# 3.zadanie - casova peciatka
+## 3.zadanie - casova peciatka
 - nové tlačidlo – prevod EPES na **T formu**
   - Vstup – pôvodný podpis XAdES EPES
   - Výstup – rozšírený podpis o časovú pečiatku XAdES T uložený v novom súbore

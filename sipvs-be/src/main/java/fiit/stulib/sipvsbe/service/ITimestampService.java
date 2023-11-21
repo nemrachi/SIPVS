@@ -1,8 +1,10 @@
 package fiit.stulib.sipvsbe.service;
 
+import org.bouncycastle.tsp.TimeStampRequest;
+
 public interface ITimestampService {
 
-    String getTimestamp();
+    String createTimestamp(String signedXML);
 
-    String addTimestampToDocument();
+    String createStamped(TimeStampRequest tsRequest, String xmlString);
 }

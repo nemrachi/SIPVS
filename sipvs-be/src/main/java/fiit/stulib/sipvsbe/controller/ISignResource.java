@@ -10,7 +10,7 @@ public interface ISignResource {
 
     @GetMapping("/generatePdfFromXml")
     String generatePdfFromXml();
-    
+
     @GetMapping(path = "/getxml", produces = "application/xml")
     String getXml();
 

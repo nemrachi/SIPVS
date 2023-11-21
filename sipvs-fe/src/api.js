@@ -90,18 +90,24 @@ export const confirmData = async (loan) => {
   }
 };
 
-
 export const uploadFile = async (formData) => {
-  axios
-    .post("/api/zadanie3/timestamp", formData, {
+  try {
+    const response = await axios.post("/api/zadanie3/timestamp", formData, {
       headers: {
         "Content-Type": "multipart/form-data",
       },
-    })
-    .then((response) => {
-      console.log("Upload successful:", response.data);
-    })
-    .catch((error) => {
-      console.error("Error uploading file:", error);
+      responseType: "blob", // Set the response type to blob to handle binary data
     });
+
+    const blob = new Blob([response.data]);
+
+    const downloadLink = document.createElement("a");
+    downloadLink.href = URL.createObjectURL(blob);
+    downloadLink.download = "SignedDocumentWithTimestamp.xml";
+    downloadLink.click();
+
+    console.log("File download successful!");
+  } catch (error) {
+    console.error("Error downloading file:", error);
+  }
 };

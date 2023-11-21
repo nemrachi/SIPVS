@@ -1,10 +1,5 @@
 import React, { useState } from "react";
-import {
-  validateData,
-  transformData,
-  confirmData,
-  uploadFile,
-} from "./api";
+import { validateData, transformData, confirmData, uploadFile } from "./api";
 
 import SignComponent from "./SignComponent";
 
@@ -248,13 +243,17 @@ function App() {
         <button className="button-gray" type="button" onClick={handleSign}>
           Sign data
         </button>
-      </form>
-      <div>
+        <div style={{ paddingTop: "10px" }}>
           <input type="file" onChange={handleFileChange} />
-          <button className="button-gray" onClick={handleUpload}>
+          <button
+            type="button"
+            className="button-gray button-extra"
+            onClick={handleUpload}
+          >
             Upload
           </button>
         </div>
+      </form>
     </main>
   );
 }

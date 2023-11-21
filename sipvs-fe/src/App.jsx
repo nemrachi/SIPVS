@@ -250,7 +250,7 @@ function App() {
             className="button-gray button-extra"
             onClick={handleUpload}
           >
-            Upload
+            Add timestamp
           </button>
         </div>
       </form>

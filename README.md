@@ -175,7 +175,7 @@ Example error output:
 Status 500
 ```
 
-## POST: http://localhost:8080/api/zadanie3/timestamp
+## GET: http://localhost:8080/api/zadanie3/timestamp
 
 Example input:
 ```
@@ -230,6 +230,10 @@ cd sipvs-fe
 npm install
 npm run dev
 ```
+
+## Poznamky z cviceni su dostupne tu:
+https://docs.google.com/document/d/10XnzfjOgmgRS6fMJsDnlVr5NHXX6PPExP4UaDWbwFIY/edit?usp=sharing
+
 
 ## Podpisovac navod
 

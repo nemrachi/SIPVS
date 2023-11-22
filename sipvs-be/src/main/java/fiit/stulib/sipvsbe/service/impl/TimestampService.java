@@ -58,7 +58,7 @@ public class TimestampService implements ITimestampService {
             TimeStampResponse tsResponse = new TimeStampResponse(responseBytes);
             String timestampB64 = Base64.getEncoder().encodeToString(tsResponse.getTimeStampToken().getEncoded());
 
-            // Adding XADES-T to XADES-EPES
+            // Adding T to XADES-EPES -> creates XADES-T
             String updatedXml = doMagic(xmlString, timestampB64);
             if (updatedXml != null) return updatedXml;
 

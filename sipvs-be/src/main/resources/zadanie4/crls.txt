@@ -1,0 +1,5 @@
+crl pre podpisovy certifikat:
+http://test.ditec.sk/DTCCACrl/DTCCACrl.crl
+
+crl pre certifikat casovej peciatky:
+http://test.ditec.sk/TSAServer/crl/dtctsa.crl

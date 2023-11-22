@@ -175,7 +175,28 @@ Example error output:
 Status 500
 ```
 
-## GET: http://localhost:8080/api/zadanie3/timestamp
+## POST: http://localhost:8080/api/zadanie3/timestamp
+
+Example input:
+```
+Uploaded signed xml 
+```
+Example output:
+```
+XML string with timestamp (unformatted)
+```
+```
+Status 200
+```
+Example error output:
+```
+Runtime exception
+```
+```
+Status 500
+```
+
+## GET: http://localhost:8080/api/zadanie4/verify
 
 Example input:
 ```
@@ -183,19 +204,19 @@ N/A
 ```
 Example output:
 ```
-XML response?
+N/A
 ```
 ```
 Status 200
 ```
 Example error output:
 ```
-?
+Runtime exception
 ```
 ```
 Status 500
 ```
-
+---
 ---
 ### BE
 Java 8, Spring Boot
@@ -218,12 +239,19 @@ npm run dev
 - **? ako to spojazdnit ?**
 
 ---
-# 3.zadanie - casova peciatka
-- nové tlačidlo – prevod EPES na **T formu**
-  - Vstup – pôvodný podpis XAdES EPES
-  - Výstup – rozšírený podpis o časovú pečiatku XAdES T uložený v novom súbore
-- Tipy
-  - inšpirovať sa/použiť kód zo Sample priečinka (`sipvs-be/src/main/resources/sample-zadanie3`)
-  - pri manipulácii s XML nastaviť nástroje (parser), aby **NEmodifikoval** pôvodný obsah
-  - dôkladne si preštudovať profil
-    - identifikácia čo sa pečiatkuje
+# 4.zadanie - nova implementacia aplikacie (gui/konzola/web)(spravime ako endpoint tuto)
+- načítanie vzoriek podpisov a identifikovať problém
+  - na základe dokumentu OvereniePodpisu.doc
+  - pri identifikovaní problému vypísať konkrétnu chybu z word dokumentu
+  - pri identifikovaní problému nepokračovať ďalšími kontrolami, ale hneď skončiť
+- možnosť vyhodnotiť vzorky po jednej, alebo aj všetky naraz
+
+## Jeho komentar + z prezentacie
+- prenesenie xml na stranu OWM bez zmeny integrity
+- identifikovanie vstupneho XADES dokumentu, teba zistit ci je ho mozne parsovat a ci splna poziadavky profilu, namespace, ...
+![overenie](image.png)
+- vsetky data, ktorych integritu chcem chranit, su na ne referencie v cervenom obdlzniku
+![toto staci checknut na overenie](image-1.png)
+- dereferencovanie
+![dereferencovanie](image-2.png)
+- CRL = certificate revocation list = zoznam predcasne zrusenych certifikatov (napriklad strateny certifikat)

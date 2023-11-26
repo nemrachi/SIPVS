@@ -28,46 +28,6 @@ public class TimestampService implements ITimestampService {
     private static final int initSignatureOffset = initSignatureMatch.length();
     private static final int magicOffset = magicMatch.length();
 
-    @Override
-    public String createTimestamp(String xmlString) {
-        //String truststorePath = "C:\\Program Files\\Java\\jre1.8.0_181\\lib\\security\\cacerts";
-        //String truststorePassword = "changeit";
-        //SSLHelper.addCertificateToTruststore(truststorePath, truststorePassword);
-
-        byte[] signatureDigest;
-
-        String base64signature = xmlString.substring(xmlString.indexOf(initSignatureMatch) + initSignatureOffset, xmlString.indexOf(lastSignatureMatch));
-
-        Digest digest = new SHA256Digest();
-        digest.update(base64signature.getBytes(), 0, base64signature.length());
-        signatureDigest = new byte[digest.getDigestSize()];
-        digest.doFinal(signatureDigest, 0);
-
-        TimeStampRequestGenerator tsRequestGenerator = new TimeStampRequestGenerator();
-        tsRequestGenerator.setCertReq(true);
-        TimeStampRequest tsRequest = tsRequestGenerator.generate(TSPAlgorithms.SHA256, signatureDigest);
-
-        return createStamped(tsRequest, xmlString);
-    }
-
-    @Override
-    public String createStamped(TimeStampRequest tsRequest, String xmlString) {
-        try {
-            byte[] responseBytes = getTimestamp(tsRequest.getEncoded());
-
-            TimeStampResponse tsResponse = new TimeStampResponse(responseBytes);
-            String timestampB64 = Base64.getEncoder().encodeToString(tsResponse.getTimeStampToken().getEncoded());
-
-            // Adding T to XADES-EPES -> creates XADES-T
-            String updatedXml = doMagic(xmlString, timestampB64);
-            if (updatedXml != null) return updatedXml;
-
-        } catch (IOException | TSPException e) {
-            throw new RuntimeException(e.getMessage());
-        }
-        return null;
-    }
-
     private static byte[] getTimestamp(byte[] tsRequest) {
         try {
             URL url = new URL(AppConfig.TIMESTAMP_SERVER);
@@ -133,6 +93,46 @@ public class TimestampService implements ITimestampService {
                     xmlString.substring(magicIndex + magicOffset);
         } else {
             log.error("Error: magicMatch not found in the XML string.");
+        }
+        return null;
+    }
+
+    @Override
+    public String createTimestamp(String xmlString) {
+        //String truststorePath = "C:\\Program Files\\Java\\jre1.8.0_181\\lib\\security\\cacerts";
+        //String truststorePassword = "changeit";
+        //SSLHelper.addCertificateToTruststore(truststorePath, truststorePassword);
+
+        byte[] signatureDigest;
+
+        String base64signature = xmlString.substring(xmlString.indexOf(initSignatureMatch) + initSignatureOffset, xmlString.indexOf(lastSignatureMatch));
+
+        Digest digest = new SHA256Digest();
+        digest.update(base64signature.getBytes(), 0, base64signature.length());
+        signatureDigest = new byte[digest.getDigestSize()];
+        digest.doFinal(signatureDigest, 0);
+
+        TimeStampRequestGenerator tsRequestGenerator = new TimeStampRequestGenerator();
+        tsRequestGenerator.setCertReq(true);
+        TimeStampRequest tsRequest = tsRequestGenerator.generate(TSPAlgorithms.SHA256, signatureDigest);
+
+        return createStamped(tsRequest, xmlString);
+    }
+
+    @Override
+    public String createStamped(TimeStampRequest tsRequest, String xmlString) {
+        try {
+            byte[] responseBytes = getTimestamp(tsRequest.getEncoded());
+
+            TimeStampResponse tsResponse = new TimeStampResponse(responseBytes);
+            String timestampB64 = Base64.getEncoder().encodeToString(tsResponse.getTimeStampToken().getEncoded());
+
+            // Adding T to XADES-EPES -> creates XADES-T
+            String updatedXml = doMagic(xmlString, timestampB64);
+            if (updatedXml != null) return updatedXml;
+
+        } catch (IOException | TSPException e) {
+            throw new RuntimeException(e.getMessage());
         }
         return null;
     }

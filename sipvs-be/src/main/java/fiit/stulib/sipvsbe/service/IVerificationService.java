@@ -2,7 +2,9 @@ package fiit.stulib.sipvsbe.service;
 
 import fiit.stulib.sipvsbe.controller.dto.VerifyResultDto;
 
+import java.util.List;
+
 public interface IVerificationService {
 
-    VerifyResultDto verify();
+    List<VerifyResultDto> verify();
 }

@@ -16,30 +16,51 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.List;
 
 @Slf4j
 @Service
 public class VerificationService implements IVerificationService {
 
     @Override
-    public VerifyResultDto verify() {
-        VerifyResultDto result = new VerifyResultDto();
+    public List<VerifyResultDto> verify() {
+        List<VerifyResultDto> results = new ArrayList<>();
+
 
         for (int i = 1; i < 14; i++) {
+            VerifyResultDto result = new VerifyResultDto();
+            result.setFilename(buildFilename(i));
+
             File fileToVerify = getFile(getPath(i));
             Element rootElement = getRootElement(fileToVerify);
 
+            // data envelope check
+            String checkDataEnvelopResult = checkDataEnvelop(rootElement);
+            if (checkDataEnvelopResult != null) {
+                result.setErrorMsg(checkDataEnvelopResult);
+                continue;
+            }
+
+            // signatureMethod check
+
+            // canonicalizationMethod check
+
+            // timestamp check
 
 
-
-
+            results.add(result);
         }
 
-        return result;
+        return results;
     }
 
     private static String getPath(int fileNumber) {
-        return AppConfig.XMLS_TO_VERIFY_PATH + String.format("%02d", fileNumber) + AppConfig.SIGNED_FILE;
+        return AppConfig.XMLS_TO_VERIFY_PATH + buildFilename(fileNumber);
+    }
+
+    private static String buildFilename(int fileNumber) {
+        return String.format("%02d", fileNumber) + AppConfig.SIGNED_FILE;
     }
 
     private static File getFile(String filePath) {
@@ -60,6 +81,31 @@ public class VerificationService implements IVerificationService {
         }
 
         return document.getDocumentElement();
+    }
+
+    // VERIFYING FUNCTIONS
+
+    private static String checkDataEnvelop(Element rootElement) {
+        if (checkNamespace(rootElement)){
+            return null;
+        } else {
+            return "overenie datovej obalky: nespravny namespace";
+        }
+    }
+
+    private static boolean checkNamespace(Element rootElement) {
+        final String xzep = "xmlns:xzep";
+        final String ds = "xmlns:ds";
+        final String xzepNs = "http://www.ditec.sk/ep/signature_formats/xades_zep/v1.0";
+        final String dsNs = "http://www.w3.org/2000/09/xmldsig#";
+
+        boolean hasCorrectAttributes = rootElement.hasAttribute(xzep) &&
+                rootElement.hasAttribute(ds);
+
+        boolean hasCorrectNamespaces = xzepNs.equals(rootElement.getAttribute(xzep)) &&
+                dsNs.equals(rootElement.getAttribute(ds));
+
+        return hasCorrectAttributes && hasCorrectNamespaces;
     }
 
 }

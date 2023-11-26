@@ -11,5 +11,6 @@ public class AppConfig {
     public static final String TIMESTAMP_SERVER = "http://test.ditec.sk/TSAServer/tsa.aspx";
     public static final String SSL = "src/main/resources/static/dtcca.cer";
     public static final String XMLS_TO_VERIFY_PATH = "src/main/resources/zadanie4/priklady/";
+    public static final String SIGNED_FILE = "XadesT.xml";
 
 }

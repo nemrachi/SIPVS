@@ -35,6 +35,7 @@ public class VerificationService implements IVerificationService {
             File fileToVerify = getFile(getPath(i));
             Element rootElement = getRootElement(fileToVerify);
 
+
             // data envelope check
             String checkDataEnvelopResult = checkDataEnvelop(rootElement);
             if (checkDataEnvelopResult != null) {
@@ -43,6 +44,11 @@ public class VerificationService implements IVerificationService {
             }
 
             // signatureMethod check
+            String checkXMLSignatureResult = checkXMLSignature(rootElement);
+            if (checkXMLSignatureResult != null) {
+                result.setErrorMsg(checkXMLSignatureResult);
+                continue;
+            }
 
             // canonicalizationMethod check
 
@@ -85,6 +91,7 @@ public class VerificationService implements IVerificationService {
 
     // VERIFYING FUNCTIONS
 
+    // 1. OVERENIE DATOVEJ OBALKY
     private static String checkDataEnvelop(Element rootElement) {
         if (checkNamespace(rootElement)){
             return null;
@@ -107,5 +114,28 @@ public class VerificationService implements IVerificationService {
 
         return hasCorrectAttributes && hasCorrectNamespaces;
     }
+
+    // 2. OVERENIE XML SIGNATURE
+    private static boolean checkURI(Element rootElement) {
+        final String signatureMethod = "ds:SignatureMethod";
+        final String canonizationMethod = "ds:CanonicalizationMethod";
+
+        // todo
+        boolean hasCorrectMethod = false;
+
+        return hasCorrectMethod;
+    }
+
+    private static String checkXMLSignature(Element rootElement) {
+        if (checkURI(rootElement)) {
+            return null;
+        } else {
+            return "overenie XML podpisu: URI neobsahuje povolenu metodu";
+        }
+
+        //return null;
+    }
+
+
 
 }

@@ -96,7 +96,7 @@ public class SignatureChecker extends Verification {
              * Kontrola obsahu ds:Transforms
              * Musi obsahovať URI niektorého z podporovaných algoritmov
              */
-            if (!assertElementAttributeValue(transformElement, "Algorithm", transformMethods)) {
+            if (assertElementAttributeValue(transformElement, transformMethods)) {
 
                 throw new Zadanie4CustomException(
                         "Atribut Algorithm elementu ds:Transforms neobsahuje URI niektorého z podporovaných algoritmov");
@@ -117,7 +117,7 @@ public class SignatureChecker extends Verification {
 
             Element digestMethodElement = (Element) digestMethodElements.item(i);
 
-            if (!assertElementAttributeValue(digestMethodElement, "Algorithm", digestMethods)) {
+            if (assertElementAttributeValue(digestMethodElement, digestMethods)) {
 
                 throw new Zadanie4CustomException(
                         "Atribút Algorithm elementu ds:DigestMethod neobsahuje URI niektorého z podporovaných algoritmov");
@@ -160,7 +160,7 @@ public class SignatureChecker extends Verification {
 
             Element digestMethodElement = (Element) referenceElement.getElementsByTagName("ds:DigestMethod").item(0);
 
-            if (!assertElementAttributeValue(digestMethodElement, "Algorithm", digestMethods)) {
+            if (assertElementAttributeValue(digestMethodElement, digestMethods)) {
 
                 throw new Zadanie4CustomException(
                         "Atribút Algorithm elementu ds:DigestMethod (" + digestMethodElement.getAttribute("Algorithm") +
@@ -181,7 +181,7 @@ public class SignatureChecker extends Verification {
             } catch (TransformerException e) {
 
                 throw new Zadanie4CustomException(
-                        "Core validation zlyhala. Chyba pri tranformacii z Element do String", e);
+                        "Core validation zlyhala. Chyba pri tranformacii z Element do String");
             }
 
             NodeList transformsElements = manifestElement.getElementsByTagName("ds:Transforms");
@@ -203,7 +203,7 @@ public class SignatureChecker extends Verification {
             } catch (NoSuchAlgorithmException e) {
 
                 throw new Zadanie4CustomException(
-                        "Core validation zlyhala. Neznamy algoritmus " + digestMethod, e);
+                        "Core validation zlyhala. Neznamy algoritmus " + digestMethod);
             }
             String actualDigestValue = new String(Base64.encode(messageDigest.digest(manifestElementBytes)));
 
@@ -236,7 +236,7 @@ public class SignatureChecker extends Verification {
         } catch (InvalidCanonicalizerException | CanonicalizationException |
                  IOException e) {
 
-            throw new Zadanie4CustomException("Core validation zlyhala. Chyba pri kanonikalizacii", e);
+            throw new Zadanie4CustomException("Core validation zlyhala. Chyba pri kanonikalizacii");
         } catch (XMLParserException e) {
             throw new RuntimeException(e);
         }
@@ -267,7 +267,7 @@ public class SignatureChecker extends Verification {
         } catch (TransformerException e) {
 
             throw new Zadanie4CustomException(
-                    "Core validation zlyhala. Chyba pri tranformacii z Element do String", e);
+                    "Core validation zlyhala. Chyba pri tranformacii z Element do String");
         }
 
         String canonicalizationMethod = canonicalizationMethodElement.getAttribute("Algorithm");
@@ -278,10 +278,11 @@ public class SignatureChecker extends Verification {
         try {
             certificate = Zadanie4Helper.getCertificate(document);
 
-        } catch (XPathExpressionException e) {
+        } catch (XPathExpressionException | RuntimeException | Zadanie4CustomException e) {
 
-            throw new Zadanie4CustomException(
-                    "X509 certifikát sa v dokumente nepodarilo nájsť", e);
+            throw new Zadanie4CustomException("X509 certifikát sa v dokumente nepodarilo nájsť");
+        } catch (Exception e) {
+            throw new RuntimeException(e);
         }
 
         String signatureMethod = signatureMethodElement.getAttribute("Algorithm");
@@ -296,7 +297,7 @@ public class SignatureChecker extends Verification {
         } catch (NoSuchAlgorithmException | SignatureException | InvalidKeyException e) {
 
             throw new Zadanie4CustomException(
-                    "Core validation zlyhala. Chyba pri inicializacii prace s digitalnym podpisom", e);
+                    "Core validation zlyhala. Chyba pri inicializacii prace s digitalnym podpisom");
         }
 
         String signatureValueBytes = signatureValueElement.getTextContent();
@@ -310,7 +311,7 @@ public class SignatureChecker extends Verification {
         } catch (SignatureException e) {
 
             throw new Zadanie4CustomException(
-                    "Core validation zlyhala. Chyba pri verifikacii digitalneho podpisu", e);
+                    "Core validation zlyhala. Chyba pri verifikacii digitalneho podpisu");
         }
 
         if (!verificationResult) {
@@ -369,7 +370,7 @@ public class SignatureChecker extends Verification {
             throw new Zadanie4CustomException("Element ds:Signature neobsahuje atribut Id");
         }
 
-        if (!assertElementAttributeValue(keyInfoElement, "Id")) {
+        if (assertElementAttributeValue(keyInfoElement)) {
             throw new Zadanie4CustomException("Atribút Id elementu ds:Signature neobsahuje žiadnu hodnotu");
         }
 
@@ -409,10 +410,9 @@ public class SignatureChecker extends Verification {
 
         try {
             certificate = Zadanie4Helper.getCertificate(document);
-
-        } catch (XPathExpressionException e) {
+        } catch (Exception e) {
             throw new Zadanie4CustomException(
-                    "X509 certifikát sa v dokumente nepodarilo nájsť", e);
+                    "X509 certifikát sa v dokumente nepodarilo nájsť");
         }
 
         String certifIssuerName = certificate.getIssuerX500Principal().toString().replaceAll("ST=", "S=");
@@ -448,7 +448,7 @@ public class SignatureChecker extends Verification {
             throw new Zadanie4CustomException("Element ds:SignatureProperties neobsahuje atribut Id");
         }
 
-        if (!assertElementAttributeValue(signaturePropertiesElement, "Id")) {
+        if (assertElementAttributeValue(signaturePropertiesElement)) {
             throw new Zadanie4CustomException("Atribút Id elementu ds:SignatureProperties neobsahuje žiadnu hodnotu");
         }
 
@@ -518,15 +518,12 @@ public class SignatureChecker extends Verification {
         NodeList referencesElements;
         try {
             referencesElements = XPathAPI.selectNodeList(document.getDocumentElement(), "//ds:Signature/ds:SignedInfo/ds:Reference");
-
         } catch (XPathException e) {
-
             throw new Zadanie4CustomException(
                     "Chyba pri ziskavani elementu ds:Signature/ds:SignedInfo/ds:Reference. Element nebol v dokumente najdeny");
         }
 
         for (int i = 0; i < referencesElements.getLength(); i++) {
-
             Element referenceElement = (Element) referencesElements.item(i);
             String uri = referenceElement.getAttribute("URI").substring(1);
             String actualType = referenceElement.getAttribute("Type");
@@ -537,13 +534,11 @@ public class SignatureChecker extends Verification {
                         String.format("//ds:Signature//*[@Id='%s']", uri));
 
             } catch (XPathException e) {
-
                 throw new Zadanie4CustomException(
                         "Chyba pri overeni existencie referencií v ds:SignedInfo. Chyba pri ziskavani elementu s Id " + uri);
             }
 
             if (referencedElement == null) {
-
                 throw new Zadanie4CustomException(
                         "Chyba pri overeni existencie referencií v ds:SignedInfo. Neexistuje element s Id: " + uri);
             }
@@ -551,7 +546,6 @@ public class SignatureChecker extends Verification {
             String referencedElementName = referencedElement.getNodeName();
 
             if (!REFERENCES.containsKey(referencedElementName)) {
-
                 throw new Zadanie4CustomException(
                         "Chyba pri overeni existencie referencií v ds:SignedInfo. Neznama referencia " + referencedElementName);
             }
@@ -559,7 +553,6 @@ public class SignatureChecker extends Verification {
             String expectedReferenceType = REFERENCES.get(referencedElementName);
 
             if (!actualType.equals(expectedReferenceType)) {
-
                 throw new Zadanie4CustomException(
                         "Chyba pri overeni zhody referencií v ds:SignedInfo. " + actualType + " sa nezhoduje s " + expectedReferenceType);
             }
@@ -571,14 +564,11 @@ public class SignatureChecker extends Verification {
                         "//ds:Signature/ds:SignedInfo/ds:Reference[@Type='http://www.w3.org/2000/09/xmldsig#Object']");
 
             } catch (XPathException e) {
-
                 throw new Zadanie4CustomException(
-                        "Chyba pri overeni existencie referencií v ds:SignedInfo." +
-                                "Chyba pri ziskavani elementu s Type http://www.w3.org/2000/09/xmldsig#Object", e);
+                        "Chyba pri overeni existencie referencií v ds:SignedInfo. Chyba pri ziskavani elementu s Type http://www.w3.org/2000/09/xmldsig#Object");
             }
 
             if (keyInfoReferenceElement == null) {
-
                 throw new Zadanie4CustomException(
                         "Neexistuje referencia na ds:KeyInfo element v elemente ds:Reference");
             }
@@ -590,14 +580,12 @@ public class SignatureChecker extends Verification {
                         "//ds:Signature/ds:SignedInfo/ds:Reference[@Type='http://www.w3.org/2000/09/xmldsig#SignatureProperties']");
 
             } catch (XPathException e) {
-
                 throw new Zadanie4CustomException(
                         "Chyba pri overeni existencie referencií v ds:SignedInfo." +
-                                "Chyba pri ziskavani elementu s Type http://www.w3.org/2000/09/xmldsig#SignatureProperties", e);
+                                "Chyba pri ziskavani elementu s Type http://www.w3.org/2000/09/xmldsig#SignatureProperties");
             }
 
             if (signaturePropertieReferenceElement == null) {
-
                 throw new Zadanie4CustomException(
                         "Neexistuje referencia na ds:SignatureProperties element v elemente ds:Reference");
             }
@@ -609,14 +597,12 @@ public class SignatureChecker extends Verification {
                         "//ds:Signature/ds:SignedInfo/ds:Reference[@Type='http://uri.etsi.org/01903#SignedProperties']");
 
             } catch (XPathException e) {
-
                 throw new Zadanie4CustomException(
                         "Chyba pri overeni existencie referencií v ds:SignedInfo." +
-                                "Chyba pri ziskavani elementu s Type http://uri.etsi.org/01903#SignedProperties", e);
+                                "Chyba pri ziskavani elementu s Type http://uri.etsi.org/01903#SignedProperties");
             }
 
             if (signedInfoReferenceElement == null) {
-
                 throw new Zadanie4CustomException(
                         "Neexistuje referencia na xades:SignedProperties element v elemente ds:Reference");
             }
@@ -638,7 +624,7 @@ public class SignatureChecker extends Verification {
             manifestElements = XPathAPI.selectNodeList(document.getDocumentElement(), "//ds:Signature/ds:Object/ds:Manifest");
 
         } catch (XPathException e) {
-            throw new Zadanie4CustomException("Chyba pri hladanie ds:Manifest elementov v dokumente", e);
+            throw new Zadanie4CustomException("Chyba pri hladanie ds:Manifest elementov v dokumente");
         }
 
         for (int i = 0; i < manifestElements.getLength(); i++) {
@@ -655,7 +641,7 @@ public class SignatureChecker extends Verification {
                     throw new Zadanie4CustomException("ds:Manifest element neobsahuje prave jednu referenciu na objekt");
                 }
             } catch (XPathException e) {
-                throw new Zadanie4CustomException("Chyba pri hladanii ds:Reference elementov v ds:Manifest elemente", e);
+                throw new Zadanie4CustomException("Chyba pri hladanii ds:Reference elementov v ds:Manifest elemente");
             }
         }
 
@@ -664,7 +650,7 @@ public class SignatureChecker extends Verification {
             referenceElements = XPathAPI.selectNodeList(document.getDocumentElement(), "//ds:Signature/ds:Object/ds:Manifest/ds:Reference");
         } catch (XPathException e) {
 
-            throw new Zadanie4CustomException("Chyba pri hladanii ds:Reference elementov v dokumente", e);
+            throw new Zadanie4CustomException("Chyba pri hladanii ds:Reference elementov v dokumente");
         }
 
         for (int i = 0; i < referenceElements.getLength(); i++) {
@@ -689,7 +675,7 @@ public class SignatureChecker extends Verification {
                     throw new Zadanie4CustomException("Atribút Type elementu ds:Reference neobsahuje hodnotu http://www.w3.org/2000/09/xmldsig#Object");
                 }
             } catch (XPathException e) {
-                throw new Zadanie4CustomException("Chyba pri hladanie elementov v dokumente", e);
+                throw new Zadanie4CustomException("Chyba pri hladanie elementov v dokumente");
             }
         }
     }
@@ -707,7 +693,7 @@ public class SignatureChecker extends Verification {
 
         } catch (XPathException e) {
 
-            throw new Zadanie4CustomException("Chyba pri hladanii ds:Reference elementov v dokumente", e);
+            throw new Zadanie4CustomException("Chyba pri hladanii ds:Reference elementov v dokumente");
         }
 
         for (int i = 0; i < referenceElements.getLength(); i++) {
@@ -741,7 +727,7 @@ public class SignatureChecker extends Verification {
                 } catch (TransformerException e) {
 
                     throw new Zadanie4CustomException(
-                            "Overenie referencií v elementoch ds:Manifest zlyhalo. Chyba pri tranformacii z Element do String", e);
+                            "Overenie referencií v elementoch ds:Manifest zlyhalo. Chyba pri tranformacii z Element do String");
                 }
 
                 objectElementBytes = getBytes(objectElementBytes, outputStream, transformMethod);
@@ -758,7 +744,7 @@ public class SignatureChecker extends Verification {
                 } catch (NoSuchAlgorithmException e) {
 
                     throw new Zadanie4CustomException(
-                            "Core validation zlyhala. Neznamy algoritmus " + digestMethod, e);
+                            "Core validation zlyhala. Neznamy algoritmus " + digestMethod);
                 }
 
                 String actualDigestValue = new String(Base64.encode(messageDigest.digest(objectElementBytes)));

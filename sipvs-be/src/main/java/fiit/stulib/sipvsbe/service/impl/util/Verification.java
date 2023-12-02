@@ -25,18 +25,18 @@ public abstract class Verification {
         return actualValue != null && actualValue.equals(expectedValue);
     }
 
-    protected boolean assertElementAttributeValue(Element element, String attribute, List<String> expectedValues) {
+    protected boolean assertElementAttributeValue(Element element, List<String> expectedValues) {
         for (String expectedValue : expectedValues) {
-            if (assertElementAttributeValue(element, attribute, expectedValue)) {
-                return true;
+            if (assertElementAttributeValue(element, "Algorithm", expectedValue)) {
+                return false;
             }
         }
-        return false;
+        return true;
     }
 
-    protected boolean assertElementAttributeValue(Element element, String attribute) {
-        String actualValue = element.getAttribute(attribute);
-        return !actualValue.isEmpty();
+    protected boolean assertElementAttributeValue(Element element) {
+        String actualValue = element.getAttribute("Id");
+        return actualValue.isEmpty();
     }
 
 }

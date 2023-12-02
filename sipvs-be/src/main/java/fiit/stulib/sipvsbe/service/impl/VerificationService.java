@@ -7,8 +7,6 @@ import fiit.stulib.sipvsbe.service.impl.util.SignatureChecker;
 import fiit.stulib.sipvsbe.service.impl.util.Zadanie4Helper;
 import lombok.extern.slf4j.Slf4j;
 import org.bouncycastle.cert.X509CertificateHolder;
-import org.bouncycastle.cms.CMSException;
-import org.bouncycastle.tsp.TSPException;
 import org.bouncycastle.tsp.TimeStampToken;
 import org.springframework.stereotype.Service;
 import org.w3c.dom.Document;
@@ -46,8 +44,8 @@ public class VerificationService implements IVerificationService {
 
     private static Document getRootDocument(File fileToVerify) {
         DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-        DocumentBuilder builder = null;
-        Document document = null;
+        DocumentBuilder builder;
+        Document document;
 
         try {
             builder = factory.newDocumentBuilder();
@@ -150,7 +148,7 @@ public class VerificationService implements IVerificationService {
             if (entry != null && entry.getRevocationDate().before(tsToken.getTimeStampInfo().getGenTime())) {
                 return "Overenie podpisoveho certifikatu: certifikat bol neplatny v case podpisu";
             }
-        } catch (TSPException | CMSException | IOException e) {
+        } catch (Exception e) {
             return e.getMessage();
         }
 

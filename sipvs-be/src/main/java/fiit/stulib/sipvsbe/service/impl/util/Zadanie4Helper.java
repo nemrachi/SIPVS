@@ -7,9 +7,7 @@ import org.bouncycastle.asn1.x509.Certificate;
 import org.bouncycastle.cert.X509CRLHolder;
 import org.bouncycastle.cert.X509CertificateHolder;
 import org.bouncycastle.cert.jcajce.JcaX509CRLConverter;
-import org.bouncycastle.cms.CMSException;
 import org.bouncycastle.jce.provider.X509CertificateObject;
-import org.bouncycastle.tsp.TSPException;
 import org.bouncycastle.tsp.TimeStampToken;
 import org.bouncycastle.util.Store;
 import org.bouncycastle.util.encoders.Base64;
@@ -24,15 +22,13 @@ import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
-import javax.xml.xpath.XPathExpressionException;
-import java.io.*;
-import java.net.MalformedURLException;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.InputStream;
+import java.io.StringWriter;
 import java.net.URL;
 import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
-import java.security.NoSuchProviderException;
 import java.security.Security;
-import java.security.cert.CRLException;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509CRL;
 import java.security.cert.X509Certificate;
@@ -43,12 +39,16 @@ import java.util.List;
 public class Zadanie4Helper {
 
     public static String fromElementToString(Element element) throws TransformerException {
-        StreamResult result = new StreamResult(new StringWriter());
+        StringWriter stringWriter = new StringWriter();
+        StreamResult result = new StreamResult(stringWriter);
         Transformer transformer = TransformerFactory.newInstance().newTransformer();
+
         transformer.transform(new DOMSource(element), result);
         transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes");
-        return result.getWriter().toString();
+
+        return stringWriter.toString();
     }
+
 
     public static String getAttributeValue(Element parentElement, String nodeName, String attributeName) {
         NodeList childNodes = parentElement.getChildNodes();
@@ -111,7 +111,7 @@ public class Zadanie4Helper {
         return null;
     }
 
-    public static X509CertificateObject getCertificate(Document document) throws XPathExpressionException, Zadanie4CustomException {
+    public static X509CertificateObject getCertificate(Document document) throws Exception {
 
         Element keyInfoElement = (Element) document.getElementsByTagName("ds:KeyInfo").item(0);
 
@@ -131,24 +131,21 @@ public class Zadanie4Helper {
             throw new Zadanie4CustomException("Chyba pri ziskavani certifikatu: Dokument neobsahuje element ds:X509Certificate");
         }
 
-        X509CertificateObject certObject = null;
+        X509CertificateObject certObject;
         ASN1InputStream inputStream = null;
 
         try {
             inputStream = new ASN1InputStream(new ByteArrayInputStream(Base64.decode(x509Certificate.getTextContent())));
             ASN1Sequence sequence = (ASN1Sequence) inputStream.readObject();
             certObject = new X509CertificateObject(Certificate.getInstance(sequence));
-
-        } catch (IOException | java.security.cert.CertificateParsingException e) {
-
-            throw new Zadanie4CustomException("Certifikát nebolo možné načítať", e);
-
+        } catch (Exception e) {
+            throw new Exception("Certifikát nebolo možné načítať", e);
         } finally {
             if (inputStream != null) {
                 try {
                     inputStream.close();
-                } catch (IOException e) {
-                    throw new RuntimeException(e.getMessage());
+                } catch (Exception e) {
+                    throw new Exception(e.getMessage());
                 }
             }
         }
@@ -156,7 +153,7 @@ public class Zadanie4Helper {
         return certObject;
     }
 
-    public static X509CertificateHolder getTimeStampSignatureCertificate(byte[] tsResponse) {
+    public static X509CertificateHolder getTimeStampSignatureCertificate(byte[] tsResponse) throws Exception {
         try {
             TimeStampToken token = new TimeStampToken(
                     new org.bouncycastle.cms.CMSSignedData(tsResponse)
@@ -180,36 +177,35 @@ public class Zadanie4Helper {
             }
 
             return signerCert;
-        } catch (IOException | CMSException | TSPException ex) {
-            return null;
+        } catch (Exception e) {
+            throw new Exception(e.getMessage());
         }
     }
 
-    public static X509Certificate getCert(String cert) {
+    public static X509Certificate getCert(String cert) throws Exception {
         try {
             byte[] certificateBytes = java.util.Base64.getDecoder().decode(cert);
             CertificateFactory certFactory = CertificateFactory.getInstance("X.509");
             return (X509Certificate) certFactory.generateCertificate(new ByteArrayInputStream(certificateBytes));
         } catch (Exception e) {
-            e.printStackTrace();
+            throw new Exception(e.getMessage());
         }
-        return null;
     }
 
-    public static X509CRL getCRL(String url) throws IOException {
+    public static X509CRL getCRL(String url) throws Exception {
 
         ByteArrayInputStream crlData = getDataFromUrl(url);
 
         if (crlData == null) {
-            throw new RuntimeException("Nepodarilo sa stiahnut CRL zo stranky.");
+            throw new Exception("Nepodarilo sa stiahnut CRL zo stranky.");
         }
 
         try {
             X509CRLHolder crlHolder = new X509CRLHolder(crlData);
             return new JcaX509CRLConverter().getCRL(crlHolder);
 
-        } catch (CRLException | IOException e) {
-            throw new RuntimeException(e.getMessage());
+        } catch (Exception e) {
+            throw new Exception(e.getMessage());
         }
 
     }
@@ -231,10 +227,10 @@ public class Zadanie4Helper {
 
             Security.addProvider(new org.bouncycastle.jce.provider.BouncyCastleProvider());
 
-            MessageDigest messageDigest = null;
+            MessageDigest messageDigest;
             try {
                 messageDigest = MessageDigest.getInstance(alghoritm, "BC");
-            } catch (NoSuchAlgorithmException | NoSuchProviderException e) {
+            } catch (Exception e) {
                 return "Overenie casovej peciatky: neznamy algoritmus v MI.";
             }
 
@@ -244,19 +240,19 @@ public class Zadanie4Helper {
 
             return null;
 
-        } catch (IOException | CMSException | TSPException e) {
+        } catch (Exception e) {
             return e.getMessage();
         }
 
     }
 
-    private static ByteArrayInputStream getDataFromUrl(String url) {
+    private static ByteArrayInputStream getDataFromUrl(String url) throws Exception {
 
-        URL urlHandler = null;
+        URL urlHandler;
         try {
             urlHandler = new URL(url);
-        } catch (MalformedURLException e) {
-            throw new RuntimeException(e.getMessage());
+        } catch (Exception e) {
+            throw new Exception(e.getMessage());
         }
 
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
@@ -269,15 +265,15 @@ public class Zadanie4Helper {
             while ((n = is.read(byteChunk)) > 0) {
                 baos.write(byteChunk, 0, n);
             }
-        } catch (IOException e) {
+        } catch (Exception e) {
             System.err.printf("Failed while reading bytes from %s: %s", urlHandler.toExternalForm(), e.getMessage());
             return null;
         } finally {
             if (is != null) {
                 try {
                     is.close();
-                } catch (IOException e) {
-                    throw new RuntimeException(e.getMessage());
+                } catch (Exception e) {
+                    throw new Exception(e.getMessage());
                 }
             }
         }

@@ -6,7 +6,4 @@ public class Zadanie4CustomException extends Exception {
         super(s);
     }
 
-    public Zadanie4CustomException(String s, Exception e) {
-        super(s, e);
-    }
 }

@@ -3,7 +3,8 @@ package fiit.stulib.sipvsbe.service.impl;
 import fiit.stulib.sipvsbe.controller.dto.VerifyResultDto;
 import fiit.stulib.sipvsbe.service.AppConfig;
 import fiit.stulib.sipvsbe.service.IVerificationService;
-import fiit.stulib.sipvsbe.service.impl.util.VerificationHelper;
+import fiit.stulib.sipvsbe.service.impl.util.SignatureChecker;
+import fiit.stulib.sipvsbe.service.impl.util.Zadanie4Helper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.w3c.dom.Document;
@@ -24,44 +25,6 @@ import java.util.List;
 @Service
 public class VerificationService implements IVerificationService {
 
-    @Override
-    public List<VerifyResultDto> verify() {
-        List<VerifyResultDto> results = new ArrayList<>();
-
-        for (int i = 1; i < 14; i++) {
-            VerifyResultDto result = new VerifyResultDto();
-            result.setFilename(buildFilename(i));
-
-            File fileToVerify = getFile(getPath(i));
-            Element rootElement = getRootElement(fileToVerify);
-
-
-            // data envelope check
-            String checkDataEnvelopResult = checkDataEnvelop(rootElement);
-            if (checkDataEnvelopResult != null) {
-                result.setErrorMsg(checkDataEnvelopResult);
-                results.add(result);
-                continue;
-            }
-
-            // signatureMethod and canonicalizationMethod check
-            String checkXMLSignatureResult = checkXMLSignature(rootElement);
-            if (checkXMLSignatureResult != null) {
-                result.setErrorMsg(checkXMLSignatureResult);
-                results.add(result);
-                continue;
-            }
-
-
-            // timestamp check
-
-
-            results.add(result);
-        }
-
-        return results;
-    }
-
     private static String getPath(int fileNumber) {
         return AppConfig.XMLS_TO_VERIFY_PATH + buildFilename(fileNumber);
     }
@@ -75,7 +38,7 @@ public class VerificationService implements IVerificationService {
         return path.toFile();
     }
 
-    private static Element getRootElement(File fileToVerify) {
+    private static Document getRootDocument(File fileToVerify) {
         DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
         DocumentBuilder builder = null;
         Document document = null;
@@ -87,26 +50,26 @@ public class VerificationService implements IVerificationService {
             throw new RuntimeException(e.getMessage());
         }
 
-        return document.getDocumentElement();
+        return document;
     }
-
-    /*
-    // --- VERIFYING FUNCTIONS ---
-     */
 
     // 1. OVERENIE DATOVEJ OBALKY
     private static String checkDataEnvelop(Element rootElement) {
-        if (VerificationHelper.checkNamespace(rootElement)) {
+        if (Zadanie4Helper.checkNamespace(rootElement)) {
             return null;
         } else {
             return "overenie datovej obalky: nespravny namespace";
         }
     }
 
+    /*
+    // --- VERIFYING FUNCTIONS ---
+     */
+
     // 2. OVERENIE XML SIGNATURE
     private static String checkXMLSignature(Element rootElement) {
-        String signatureMethod = VerificationHelper.getAttributeValue(rootElement, "ds:SignatureMethod", "Algorithm");
-        String canonicalizationMethod = VerificationHelper.getAttributeValue(rootElement, "ds:CanonicalizationMethod", "Algorithm");
+        String signatureMethod = Zadanie4Helper.getAttributeValue(rootElement, "ds:SignatureMethod", "Algorithm");
+        String canonicalizationMethod = Zadanie4Helper.getAttributeValue(rootElement, "ds:CanonicalizationMethod", "Algorithm");
 
         List<String> allowedAlghoritms = new ArrayList<>();
         allowedAlghoritms.add("http://www.w3.org/2000/09/xmldsig#dsa-sha1");
@@ -126,6 +89,81 @@ public class VerificationService implements IVerificationService {
         }
 
         return null;
+    }
+
+    @Override
+    public List<VerifyResultDto> verify() {
+        List<VerifyResultDto> results = new ArrayList<>();
+
+        for (int i = 1; i < 14; i++) {
+            VerifyResultDto result = new VerifyResultDto();
+            result.setFilename(buildFilename(i));
+
+            File fileToVerify = getFile(getPath(i));
+            Document document = getRootDocument(fileToVerify);
+            Element rootElement = document.getDocumentElement();
+
+
+            // data envelope check
+            String checkDataEnvelopResult = checkDataEnvelop(rootElement);
+            if (checkDataEnvelopResult != null) {
+                result.setErrorMsg(checkDataEnvelopResult);
+                results.add(result);
+                continue;
+            }
+
+            // signatureMethod and canonicalizationMethod check
+            String checkXMLSignatureResult = checkXMLSignature(rootElement);
+            if (checkXMLSignatureResult != null) {
+                result.setErrorMsg(checkXMLSignatureResult);
+                results.add(result);
+                continue;
+            }
+
+            // signature check
+            SignatureChecker signatureChecker = new SignatureChecker(document);
+            try {
+                //Elementy ds:Transforms a ds:DigestMethod
+                signatureChecker.verifyTransformsAndDigestMethod();
+
+                //Core validation
+                signatureChecker.verifyCoreReferencesAndDigestValue();
+                signatureChecker.verifyCoreSignatureValue();
+
+                //Element ds:Signature:
+                signatureChecker.verifySignature();
+
+                //Element ds:SignatureValue
+                signatureChecker.verifySignatureValueId();
+
+                //Referencie v Signedinfo
+                signatureChecker.verifySignedInfoReferencesAndAttributeValues();
+
+                //Element ds:KeyInfo
+                signatureChecker.verifyKeyInfoContent();
+
+                //Element ds:SignatureProperties
+                signatureChecker.verifySignaturePropertiesContent();
+
+                //Elementy ds:Manifest
+                signatureChecker.verifyManifestElements();
+
+                //Referencie ds:Manifest elementov
+                signatureChecker.verifyManifestElementsReferences();
+
+            } catch (Exception e) {
+                result.setErrorMsg(e.getMessage());
+                results.add(result);
+                continue;
+            }
+
+            // timestamp check
+
+
+            results.add(result);
+        }
+
+        return results;
     }
 
 

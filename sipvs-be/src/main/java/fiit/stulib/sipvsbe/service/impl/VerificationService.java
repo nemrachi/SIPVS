@@ -7,6 +7,9 @@ import fiit.stulib.sipvsbe.service.impl.util.SignatureChecker;
 import fiit.stulib.sipvsbe.service.impl.util.Zadanie4Helper;
 import lombok.extern.slf4j.Slf4j;
 import org.bouncycastle.cert.X509CertificateHolder;
+import org.bouncycastle.cms.CMSException;
+import org.bouncycastle.tsp.TSPException;
+import org.bouncycastle.tsp.TimeStampToken;
 import org.springframework.stereotype.Service;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -19,7 +22,7 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.security.cert.X509CRL;
+import java.security.cert.*;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -102,6 +105,14 @@ public class VerificationService implements IVerificationService {
                 continue;
             }
 
+            // sign certificate check
+            String checkSignCertResult = checkSignCert(rootElement);
+            if (checkSignCertResult != null) {
+                result.setErrorMsg(checkSignCertResult);
+                results.add(result);
+                continue;
+            }
+
             results.add(result);
         }
 
@@ -145,10 +156,6 @@ public class VerificationService implements IVerificationService {
         }
     }
 
-    /*
-    // --- VERIFYING FUNCTIONS ---
-     */
-
     // 2. OVERENIE XML SIGNATURE
     private static String checkXMLSignature(Element rootElement) {
         String signatureMethod = Zadanie4Helper.getAttributeValue(rootElement, "ds:SignatureMethod", "Algorithm");
@@ -175,23 +182,23 @@ public class VerificationService implements IVerificationService {
     }
 
     // 4. OVERENIE CASOVEJ PECIATKY
-    private String checkTimestamp(Element rootElement) {
+    private static String checkTimestamp(Element rootElement) {
         String timestamp = Zadanie4Helper.getNodeValue(rootElement, "xades:EncapsulatedTimeStamp");
         try {
             byte[] timestampBytes = java.util.Base64.getDecoder().decode(timestamp);
             X509CertificateHolder tsCert = Zadanie4Helper.getTimeStampSignatureCertificate(timestampBytes);
 
-            if (tsCert == null){
+            if (tsCert == null) {
                 return "Overenie casovej peciatky: casova peciatka nebola najdena";
             }
 
-            if (!tsCert.isValidOn(new Date())){
+            if (!tsCert.isValidOn(new Date())) {
                 return "Overenie casovej peciatky: neplatny cas voci aktualnemu datumu.";
             }
 
             X509CRL crl = Zadanie4Helper.getCRL("http://test.ditec.sk/TSAServer/crl/dtctsa.crl");
 
-            if (crl.getRevokedCertificate(tsCert.getSerialNumber()) != null){
+            if (crl.getRevokedCertificate(tsCert.getSerialNumber()) != null) {
                 return "Overenie casovej peciatky: neplatny certifikat podla CRL";
             }
 
@@ -200,6 +207,42 @@ public class VerificationService implements IVerificationService {
         } catch (Exception e) {
             return e.getMessage();
         }
+    }
+
+    // 3. Overenie certu
+    private static String checkSignCert(Element rootElement) {
+        try {
+            String certValue = Zadanie4Helper.getNodeValue(rootElement, "ds:X509Certificate");
+            X509Certificate cert = Zadanie4Helper.getCert(certValue);
+
+            if (cert == null) {
+                return "Overenie podpisoveho certifikatu: chyba pri citani certifikatu";
+            }
+
+            String timestamp = Zadanie4Helper.getNodeValue(rootElement, "xades:EncapsulatedTimeStamp");
+            byte[] timestampBytes = java.util.Base64.getDecoder().decode(timestamp);
+            TimeStampToken tsToken = new TimeStampToken(
+                    new org.bouncycastle.cms.CMSSignedData(timestampBytes)
+            );
+
+            try {
+                cert.checkValidity(tsToken.getTimeStampInfo().getGenTime());
+            } catch (CertificateExpiredException e) {
+                return "Overenie podpisoveho certifikatu: certifikat expirovany";
+            } catch (CertificateNotYetValidException e) {
+                return "Overenie podpisoveho certifikatu: certifikat este nebol platny v case podpisu";
+            }
+
+            X509CRL crl = Zadanie4Helper.getCRL("http://test.ditec.sk/DTCCACrl/DTCCACrl.crl");
+            X509CRLEntry entry = crl.getRevokedCertificate(cert.getSerialNumber());
+            if (entry != null && entry.getRevocationDate().before(tsToken.getTimeStampInfo().getGenTime())) {
+                return "Overenie podpisoveho certifikatu: certifikat bol neplatny v case podpisu";
+            }
+        } catch (TSPException | CMSException | IOException e) {
+            return e.getMessage();
+        }
+
+        return null;
     }
 
 

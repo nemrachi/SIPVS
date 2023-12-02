@@ -1,8 +1,9 @@
-package fiit.stulib.sipvsbe.service.impl.util;
+package fiit.stulib.sipvsbe.service.impl;
 
 import fiit.stulib.sipvsbe.controller.dto.VerifyResultDto;
 import fiit.stulib.sipvsbe.service.AppConfig;
 import fiit.stulib.sipvsbe.service.IVerificationService;
+import fiit.stulib.sipvsbe.service.impl.util.VerificationHelper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.w3c.dom.Document;
@@ -27,7 +28,6 @@ public class VerificationService implements IVerificationService {
     public List<VerifyResultDto> verify() {
         List<VerifyResultDto> results = new ArrayList<>();
 
-
         for (int i = 1; i < 14; i++) {
             VerifyResultDto result = new VerifyResultDto();
             result.setFilename(buildFilename(i));
@@ -40,17 +40,18 @@ public class VerificationService implements IVerificationService {
             String checkDataEnvelopResult = checkDataEnvelop(rootElement);
             if (checkDataEnvelopResult != null) {
                 result.setErrorMsg(checkDataEnvelopResult);
+                results.add(result);
                 continue;
             }
 
-            // signatureMethod check
+            // signatureMethod and canonicalizationMethod check
             String checkXMLSignatureResult = checkXMLSignature(rootElement);
             if (checkXMLSignatureResult != null) {
                 result.setErrorMsg(checkXMLSignatureResult);
+                results.add(result);
                 continue;
             }
 
-            // canonicalizationMethod check
 
             // timestamp check
 
@@ -89,53 +90,43 @@ public class VerificationService implements IVerificationService {
         return document.getDocumentElement();
     }
 
-    // VERIFYING FUNCTIONS
+    /*
+    // --- VERIFYING FUNCTIONS ---
+     */
 
     // 1. OVERENIE DATOVEJ OBALKY
     private static String checkDataEnvelop(Element rootElement) {
-        if (checkNamespace(rootElement)){
+        if (VerificationHelper.checkNamespace(rootElement)) {
             return null;
         } else {
             return "overenie datovej obalky: nespravny namespace";
         }
     }
 
-    private static boolean checkNamespace(Element rootElement) {
-        final String xzep = "xmlns:xzep";
-        final String ds = "xmlns:ds";
-        final String xzepNs = "http://www.ditec.sk/ep/signature_formats/xades_zep/v1.0";
-        final String dsNs = "http://www.w3.org/2000/09/xmldsig#";
-
-        boolean hasCorrectAttributes = rootElement.hasAttribute(xzep) &&
-                rootElement.hasAttribute(ds);
-
-        boolean hasCorrectNamespaces = xzepNs.equals(rootElement.getAttribute(xzep)) &&
-                dsNs.equals(rootElement.getAttribute(ds));
-
-        return hasCorrectAttributes && hasCorrectNamespaces;
-    }
-
     // 2. OVERENIE XML SIGNATURE
-    private static boolean checkURI(Element rootElement) {
-        final String signatureMethod = "ds:SignatureMethod";
-        final String canonizationMethod = "ds:CanonicalizationMethod";
-
-        // todo
-        boolean hasCorrectMethod = false;
-
-        return hasCorrectMethod;
-    }
-
     private static String checkXMLSignature(Element rootElement) {
-        if (checkURI(rootElement)) {
-            return null;
-        } else {
-            return "overenie XML podpisu: URI neobsahuje povolenu metodu";
+        String signatureMethod = VerificationHelper.getAttributeValue(rootElement, "ds:SignatureMethod", "Algorithm");
+        String canonicalizationMethod = VerificationHelper.getAttributeValue(rootElement, "ds:CanonicalizationMethod", "Algorithm");
+
+        List<String> allowedAlghoritms = new ArrayList<>();
+        allowedAlghoritms.add("http://www.w3.org/2000/09/xmldsig#dsa-sha1");
+        allowedAlghoritms.add("http://www.w3.org/2000/09/xmldsig#rsa-sha1");
+        allowedAlghoritms.add("http://www.w3.org/2001/04/xmldsig-more#rsa-sha256");
+        allowedAlghoritms.add("http://www.w3.org/2001/04/xmldsig-more#rsa-sha384");
+        allowedAlghoritms.add("http://www.w3.org/2001/04/xmldsig-more#rsa-sha512");
+        allowedAlghoritms.add("http://www.w3.org/2000/09/xmldsig#sha1");
+        allowedAlghoritms.add("http://www.w3.org/2001/04/xmldsig");
+        allowedAlghoritms.add("http://www.w3.org/2001/04/xmlenc#sha256");
+        allowedAlghoritms.add("http://www.w3.org/2001/04/xmldsig-more#sha384");
+        allowedAlghoritms.add("http://www.w3.org/2001/04/xmlenc#sha512");
+
+        if (!allowedAlghoritms.contains(signatureMethod) ||
+                !canonicalizationMethod.equals("http://www.w3.org/TR/2001/REC-xml-c14n-20010315")) {
+            return "overenie xml signature: nespravny SignatureMethod alebo CanonicalizationMethod";
         }
 
-        //return null;
+        return null;
     }
-
 
 
 }

@@ -22,10 +22,7 @@ public abstract class Verification {
 
     protected boolean assertElementAttributeValue(Element element, String attribute, String expectedValue) {
         String actualValue = element.getAttribute(attribute);
-        if (actualValue != null && actualValue.equals(expectedValue)) {
-            return true;
-        }
-        return false;
+        return actualValue != null && actualValue.equals(expectedValue);
     }
 
     protected boolean assertElementAttributeValue(Element element, String attribute, List<String> expectedValues) {
@@ -39,10 +36,7 @@ public abstract class Verification {
 
     protected boolean assertElementAttributeValue(Element element, String attribute) {
         String actualValue = element.getAttribute(attribute);
-        if (!actualValue.isEmpty()) {
-            return true;
-        }
-        return false;
+        return !actualValue.isEmpty();
     }
 
 }

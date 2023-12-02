@@ -28,7 +28,7 @@ public class SignatureChecker extends Verification {
     private static final Map<String, String> SIGN_ALG;
 
     static {
-        REFERENCES = new HashMap<String, String>();
+        REFERENCES = new HashMap<>();
         REFERENCES.put("ds:KeyInfo", "http://www.w3.org/2000/09/xmldsig#Object");
         REFERENCES.put("ds:SignatureProperties", "http://www.w3.org/2000/09/xmldsig#SignatureProperties");
         REFERENCES.put("xades:SignedProperties", "http://uri.etsi.org/01903#SignedProperties");
@@ -36,7 +36,7 @@ public class SignatureChecker extends Verification {
     }
 
     static {
-        DIGEST_ALG = new HashMap<String, String>();
+        DIGEST_ALG = new HashMap<>();
         DIGEST_ALG.put("http://www.w3.org/2000/09/xmldsig#sha1", "SHA-1");
         DIGEST_ALG.put("http://www.w3.org/2001/04/xmldsig-more#sha224", "SHA-224");
         DIGEST_ALG.put("http://www.w3.org/2001/04/xmlenc#sha256", "SHA-256");
@@ -45,7 +45,7 @@ public class SignatureChecker extends Verification {
     }
 
     static {
-        SIGN_ALG = new HashMap<String, String>();
+        SIGN_ALG = new HashMap<>();
         SIGN_ALG.put("http://www.w3.org/2000/09/xmldsig#dsa-sha1", "SHA1withDSA");
         SIGN_ALG.put("http://www.w3.org/2000/09/xmldsig#rsa-sha1", "SHA1withRSA/ISO9796-2");
         SIGN_ALG.put("http://www.w3.org/2001/04/xmldsig-more#rsa-sha256", "SHA256withRSA");
@@ -53,105 +53,33 @@ public class SignatureChecker extends Verification {
         SIGN_ALG.put("http://www.w3.org/2001/04/xmldsig-more#rsa-sha512", "SHA512withRSA");
     }
 
-    private List<String> signatureMethods = new ArrayList<String>(Arrays.asList(
+    private final List<String> transformMethods;
+    private final List<String> digestMethods = new ArrayList<>(Arrays.asList(
 
-            new String[]{
-                    "http://www.w3.org/2000/09/xmldsig#dsa-sha1",
-                    "http://www.w3.org/2000/09/xmldsig#rsa-sha1",
-                    "http://www.w3.org/2001/04/xmldsig-more#rsa-sha256",
-                    "http://www.w3.org/2001/04/xmldsig-more#rsa-sha384",
-                    "http://www.w3.org/2001/04/xmldsig-more#rsa-sha512"
-            }
-    ));
-    private List<String> canonicalizationMethods = new ArrayList<String>(Arrays.asList(
+            "http://www.w3.org/2000/09/xmldsig#sha1",
+            "http://www.w3.org/2001/04/xmldsig-more#sha224",
+            "http://www.w3.org/2001/04/xmlenc#sha256",
+            "http://www.w3.org/2001/04/xmldsig-more#sha384",
+            "http://www.w3.org/2001/04/xmlenc#sha512"));
+    private final List<String> manifestTransformMethods = new ArrayList<>(Arrays.asList(
 
-            new String[]{
-                    "http://www.w3.org/TR/2001/REC-xml-c14n-20010315"
-            }
-    ));
-    private List<String> transformMethods = new ArrayList<String>(Arrays.asList(
-
-            new String[]{
-                    "http://www.w3.org/TR/2001/REC-xml-c14n-20010315"
-            }
-    ));
-    private List<String> digestMethods = new ArrayList<String>(Arrays.asList(
-
-            new String[]{
-                    "http://www.w3.org/2000/09/xmldsig#sha1",
-                    "http://www.w3.org/2001/04/xmldsig-more#sha224",
-                    "http://www.w3.org/2001/04/xmlenc#sha256",
-                    "http://www.w3.org/2001/04/xmldsig-more#sha384",
-                    "http://www.w3.org/2001/04/xmlenc#sha512"
-            }
-    ));
-    private List<String> manifestTransformMethods = new ArrayList<String>(Arrays.asList(
-
-            new String[]{
-                    "http://www.w3.org/TR/2001/REC-xml-c14n-20010315",
-                    "http://www.w3.org/2000/09/xmldsig#base64"
-            }
-    ));
+            "http://www.w3.org/TR/2001/REC-xml-c14n-20010315",
+            "http://www.w3.org/2000/09/xmldsig#base64"));
 
     public SignatureChecker(Document document) {
         super(document);
-    }
+        transformMethods = new ArrayList<>(Collections.singletonList(
 
-    /*
-     * Kontrola obsahu ds:SignatureMethod a ds:CanonicalizationMethod
-     * Musia obsahovať URI niektorého z podporovaných algoritmov pre dané elementy podľa profilu XAdES_ZEP
-     */
-    public boolean verifySignatureMethodAndCanonicalizationMethod() throws Zadanie4CustomException {
-
-        Element signatureMethod = null;
-        try {
-            signatureMethod = (Element) XPathAPI.selectSingleNode(document.getDocumentElement(), "//ds:Signature/ds:SignedInfo/ds:SignatureMethod");
-
-        } catch (XPathException e) {
-
-            throw new Zadanie4CustomException(
-                    "Chyba pri kontrole elementu ds:Signature/ds:SignedInfo/ds:SignatureMethod. Element nebol v dokumente najdeny");
-        }
-
-        /*
-         * Kontrola obsahu ds:SignatureMethod
-         */
-        if (assertElementAttributeValue(signatureMethod, "Algorithm", signatureMethods) == false) {
-
-            throw new Zadanie4CustomException(
-                    "Atribút Algorithm elementu ds:SignatureMethod neobsahuje URI niektorého z podporovaných algoritmov");
-        }
-
-
-        Element canonicalizationMethod = null;
-        try {
-            canonicalizationMethod = (Element) XPathAPI.selectSingleNode(document.getDocumentElement(), "//ds:Signature/ds:SignedInfo/ds:CanonicalizationMethod");
-
-        } catch (XPathException e) {
-
-            throw new Zadanie4CustomException(
-                    "Chyba pri kontrole elementu ds:Signature/ds:SignedInfo/ds:CanonicalizationMethod. Element nebol v dokumente najdeny");
-        }
-
-        /*
-         * Kontrola obsahu ds:CanonicalizationMethod
-         */
-        if (assertElementAttributeValue(canonicalizationMethod, "Algorithm", canonicalizationMethods) == false) {
-
-            throw new Zadanie4CustomException(
-                    "Atribút Algorithm elementu ds:CanonicalizationMethod neobsahuje URI niektorého z podporovaných algoritmov");
-        }
-
-        return true;
+                "http://www.w3.org/TR/2001/REC-xml-c14n-20010315"));
     }
 
     /*
      * Kontrola obsahu ds:Transforms a ds:DigestMethod vo všetkých referenciách v ds:SignedInfo
      * Musia obsahovať URI niektorého z podporovaných algoritmov podľa profilu XAdES_ZEP
      */
-    public boolean verifyTransformsAndDigestMethod() throws Zadanie4CustomException {
+    public void verifyTransformsAndDigestMethod() throws Zadanie4CustomException {
 
-        NodeList transformsElements = null;
+        NodeList transformsElements;
         try {
             transformsElements = XPathAPI.selectNodeList(document.getDocumentElement(), "//ds:Signature/ds:SignedInfo/ds:Reference/ds:Transforms");
 
@@ -170,7 +98,7 @@ public class SignatureChecker extends Verification {
              * Kontrola obsahu ds:Transforms
              * Musi obsahovať URI niektorého z podporovaných algoritmov
              */
-            if (assertElementAttributeValue(transformElement, "Algorithm", transformMethods) == false) {
+            if (!assertElementAttributeValue(transformElement, "Algorithm", transformMethods)) {
 
                 throw new Zadanie4CustomException(
                         "Atribút Algorithm elementu ds:Transforms neobsahuje URI niektorého z podporovaných algoritmov");
@@ -178,7 +106,7 @@ public class SignatureChecker extends Verification {
         }
 
 
-        NodeList digestMethodElements = null;
+        NodeList digestMethodElements;
         try {
             digestMethodElements = XPathAPI.selectNodeList(document.getDocumentElement(), "//ds:Signature/ds:SignedInfo/ds:Reference/ds:DigestMethod");
 
@@ -192,14 +120,13 @@ public class SignatureChecker extends Verification {
 
             Element digestMethodElement = (Element) digestMethodElements.item(i);
 
-            if (assertElementAttributeValue(digestMethodElement, "Algorithm", digestMethods) == false) {
+            if (!assertElementAttributeValue(digestMethodElement, "Algorithm", digestMethods)) {
 
                 throw new Zadanie4CustomException(
                         "Atribút Algorithm elementu ds:DigestMethod neobsahuje URI niektorého z podporovaných algoritmov");
             }
         }
 
-        return true;
     }
 
     /*
@@ -207,9 +134,9 @@ public class SignatureChecker extends Verification {
      * Dereferencovanie URI, kanonikalizácia referencovaných ds:Manifest elementov
      * a overenie hodnôt odtlačkov ds:DigestValue
      */
-    public boolean verifyCoreReferencesAndDigestValue() throws Zadanie4CustomException {
+    public void verifyCoreReferencesAndDigestValue() throws Zadanie4CustomException {
 
-        NodeList referencesElements = null;
+        NodeList referencesElements;
         try {
             referencesElements = XPathAPI.selectNodeList(document.getDocumentElement(), "//ds:Signature/ds:SignedInfo/ds:Reference");
 
@@ -235,7 +162,7 @@ public class SignatureChecker extends Verification {
 
             Element digestMethodElement = (Element) referenceElement.getElementsByTagName("ds:DigestMethod").item(0);
 
-            if (assertElementAttributeValue(digestMethodElement, "Algorithm", digestMethods) == false) {
+            if (!assertElementAttributeValue(digestMethodElement, "Algorithm", digestMethods)) {
 
                 throw new Zadanie4CustomException(
                         "Atribút Algorithm elementu ds:DigestMethod (" + digestMethodElement.getAttribute("Algorithm") +
@@ -246,7 +173,7 @@ public class SignatureChecker extends Verification {
             digestMethod = DIGEST_ALG.get(digestMethod);
 
 
-            byte[] manifestElementBytes = null;
+            byte[] manifestElementBytes;
 
             try {
                 manifestElementBytes = Zadanie4Helper.fromElementToString(manifestElement).getBytes();
@@ -265,21 +192,10 @@ public class SignatureChecker extends Verification {
                 Element transformElement = (Element) transformsElement.getElementsByTagName("ds:Transform").item(0);
                 String transformMethod = transformElement.getAttribute("Algorithm");
 
-                if ("http://www.w3.org/TR/2001/REC-xml-c14n-20010315".equals(transformMethod)) {
-
-                    try {
-                        Canonicalizer canonicalizer = Canonicalizer.getInstance(transformMethod);
-                        manifestElementBytes = canonicalizer.canonicalize(manifestElementBytes);
-
-                    } catch (SAXException | InvalidCanonicalizerException | CanonicalizationException |
-                             ParserConfigurationException | IOException e) {
-
-                        throw new Zadanie4CustomException("Core validation zlyhala. Chyba pri kanonikalizacii", e);
-                    }
-                }
+                manifestElementBytes = getBytes(transformMethod, manifestElementBytes);
             }
 
-            MessageDigest messageDigest = null;
+            MessageDigest messageDigest;
 
             try {
                 messageDigest = MessageDigest.getInstance(digestMethod);
@@ -292,7 +208,7 @@ public class SignatureChecker extends Verification {
             String actualDigestValue = new String(Base64.encode(messageDigest.digest(manifestElementBytes)));
 
 
-            if (expectedDigestValue.equals(actualDigestValue) == false) {
+            if (!expectedDigestValue.equals(actualDigestValue)) {
 
                 throw new Zadanie4CustomException(
                         "Core validation zlyhala. " +
@@ -301,7 +217,6 @@ public class SignatureChecker extends Verification {
 
         }
 
-        return true;
     }
 
     /*
@@ -309,7 +224,7 @@ public class SignatureChecker extends Verification {
      * Kanonikalizácia ds:SignedInfo a overenie hodnoty ds:SignatureValue
      * pomocou pripojeného podpisového certifikátu v ds:KeyInfo
      */
-    public boolean verifyCoreSignatureValue() throws Zadanie4CustomException {
+    public void verifyCoreSignatureValue() throws Zadanie4CustomException {
 
         Element signatureElement = (Element) document.getElementsByTagName("ds:Signature").item(0);
 
@@ -319,7 +234,7 @@ public class SignatureChecker extends Verification {
         Element signatureValueElement = (Element) signatureElement.getElementsByTagName("ds:SignatureValue").item(0);
 
 
-        byte[] signedInfoElementBytes = null;
+        byte[] signedInfoElementBytes;
         try {
             signedInfoElementBytes = Zadanie4Helper.fromElementToString(signedInfoElement).getBytes();
         } catch (TransformerException e) {
@@ -340,7 +255,7 @@ public class SignatureChecker extends Verification {
             throw new Zadanie4CustomException("Core validation zlyhala. Chyba pri kanonikalizacii", e);
         }
 
-        X509CertificateObject certificate = null;
+        X509CertificateObject certificate;
         try {
             certificate = Zadanie4Helper.getCertificate(document);
         } catch (XPathExpressionException e) {
@@ -351,7 +266,7 @@ public class SignatureChecker extends Verification {
         String signatureMethod = signatureMethodElement.getAttribute("Algorithm");
         signatureMethod = SIGN_ALG.get(signatureMethod);
 
-        Signature signer = null;
+        Signature signer;
         try {
             signer = Signature.getInstance(signatureMethod);
             signer.initVerify(certificate.getPublicKey());
@@ -366,7 +281,7 @@ public class SignatureChecker extends Verification {
         byte[] signatureValueBytes = signatureValueElement.getTextContent().getBytes();
         byte[] decodedSignatureValueBytes = Base64.decode(signatureValueBytes);
 
-        boolean verificationResult = false;
+        boolean verificationResult;
 
         try {
             verificationResult = signer.verify(decodedSignatureValueBytes);
@@ -377,13 +292,12 @@ public class SignatureChecker extends Verification {
                     "Core validation zlyhala. Chyba pri verifikacii digitalneho podpisu", e);
         }
 
-        if (verificationResult == false) {
+        if (!verificationResult) {
 
             throw new Zadanie4CustomException(
                     "Podpisana hodnota ds:SignedInfo sa nezhoduje s hodnotou v elemente ds:SignatureValue");
         }
 
-        return true;
     }
 
     /*
@@ -391,7 +305,7 @@ public class SignatureChecker extends Verification {
      * 	- musí mať Id atribút,
      * 	- musí mať špecifikovaný namespace xmlns:ds
      */
-    public boolean verifySignature() throws Zadanie4CustomException {
+    public void verifySignature() throws Zadanie4CustomException {
 
         Element signatureElement = (Element) document.getElementsByTagName("ds:Signature").item(0);
 
@@ -401,32 +315,31 @@ public class SignatureChecker extends Verification {
                     "Element ds:Signature sa nenašiel");
         }
 
-        if (signatureElement.hasAttribute("Id") == false) {
+        if (!signatureElement.hasAttribute("Id")) {
 
             throw new Zadanie4CustomException(
                     "Element ds:Signature neobsahuje atribút Id");
         }
 
-        if (assertElementAttributeValue(signatureElement, "Id") == false) {
+        if (!assertElementAttributeValue(signatureElement, "Id")) {
 
             throw new Zadanie4CustomException(
                     "Atribút Id elementu ds:Signature neobsahuje žiadnu hodnotu");
         }
 
-        if (assertElementAttributeValue(signatureElement, "xmlns:ds", "http://www.w3.org/2000/09/xmldsig#") == false) {
+        if (!assertElementAttributeValue(signatureElement, "xmlns:ds", "http://www.w3.org/2000/09/xmldsig#")) {
 
             throw new Zadanie4CustomException(
                     "Element ds:Signature nemá nastavený namespace xmlns:ds");
         }
 
-        return true;
     }
 
     /*
      * Element ds:SignatureValue
      * 	– musí mať Id atribút
      */
-    public boolean verifySignatureValueId() throws Zadanie4CustomException {
+    public void verifySignatureValueId() throws Zadanie4CustomException {
 
         Element signatureValueElement = (Element) document.getElementsByTagName("ds:SignatureValue").item(0);
 
@@ -436,13 +349,12 @@ public class SignatureChecker extends Verification {
                     "Element ds:SignatureValue sa nenašiel");
         }
 
-        if (signatureValueElement.hasAttribute("Id") == false) {
+        if (!signatureValueElement.hasAttribute("Id")) {
 
             throw new Zadanie4CustomException(
                     "Element ds:SignatureValue neobsahuje atribút Id");
         }
 
-        return true;
     }
 
     /*
@@ -452,9 +364,9 @@ public class SignatureChecker extends Verification {
      * 	- xades:SignedProperties element,
      * 	- všetky ostatné referencie v rámci ds:SignedInfo musia byť referenciami na ds:Manifest elementy
      */
-    public boolean verifySignedInfoReferencesAndAttributeValues() throws Zadanie4CustomException {
+    public void verifySignedInfoReferencesAndAttributeValues() throws Zadanie4CustomException {
 
-        NodeList referencesElements = null;
+        NodeList referencesElements;
         try {
             referencesElements = XPathAPI.selectNodeList(document.getDocumentElement(), "//ds:Signature/ds:SignedInfo/ds:Reference");
 
@@ -470,7 +382,7 @@ public class SignatureChecker extends Verification {
             String uri = referenceElement.getAttribute("URI").substring(1);
             String actualType = referenceElement.getAttribute("Type");
 
-            Element referencedElement = null;
+            Element referencedElement;
             try {
                 referencedElement = (Element) XPathAPI.selectSingleNode(this.document.getDocumentElement(),
                         String.format("//ds:Signature//*[@Id='%s']", uri));
@@ -489,7 +401,7 @@ public class SignatureChecker extends Verification {
 
             String referencedElementName = referencedElement.getNodeName();
 
-            if (REFERENCES.containsKey(referencedElementName) == false) {
+            if (!REFERENCES.containsKey(referencedElementName)) {
 
                 throw new Zadanie4CustomException(
                         "Chyba pri overeni existencie referencií v ds:SignedInfo. Neznama referencia " + referencedElementName);
@@ -497,14 +409,14 @@ public class SignatureChecker extends Verification {
 
             String expectedReferenceType = REFERENCES.get(referencedElementName);
 
-            if (actualType.equals(expectedReferenceType) == false) {
+            if (!actualType.equals(expectedReferenceType)) {
 
                 throw new Zadanie4CustomException(
                         "Chyba pri overeni zhody referencií v ds:SignedInfo. " + actualType + " sa nezhoduje s " + expectedReferenceType);
             }
 
 
-            Element keyInfoReferenceElement = null;
+            Element keyInfoReferenceElement;
             try {
                 keyInfoReferenceElement = (Element) XPathAPI.selectSingleNode(this.document.getDocumentElement(),
                         "//ds:Signature/ds:SignedInfo/ds:Reference[@Type='http://www.w3.org/2000/09/xmldsig#Object']");
@@ -523,7 +435,7 @@ public class SignatureChecker extends Verification {
             }
 
 
-            Element signaturePropertieReferenceElement = null;
+            Element signaturePropertieReferenceElement;
             try {
                 signaturePropertieReferenceElement = (Element) XPathAPI.selectSingleNode(this.document.getDocumentElement(),
                         "//ds:Signature/ds:SignedInfo/ds:Reference[@Type='http://www.w3.org/2000/09/xmldsig#SignatureProperties']");
@@ -542,7 +454,7 @@ public class SignatureChecker extends Verification {
             }
 
 
-            Element signedInfoReferenceElement = null;
+            Element signedInfoReferenceElement;
             try {
                 signedInfoReferenceElement = (Element) XPathAPI.selectSingleNode(this.document.getDocumentElement(),
                         "//ds:Signature/ds:SignedInfo/ds:Reference[@Type='http://uri.etsi.org/01903#SignedProperties']");
@@ -561,7 +473,6 @@ public class SignatureChecker extends Verification {
             }
         }
 
-        return true;
     }
 
     /*
@@ -571,7 +482,7 @@ public class SignatureChecker extends Verification {
      * 	- hodnoty elementov ds:X509IssuerSerial a ds:X509SubjectName súhlasia s príslušnými hodnatami v certifikáte,
      * 	  ktorý sa nachádza v ds:X509Certificate
      */
-    public boolean verifyKeyInfoContent() throws Zadanie4CustomException {
+    public void verifyKeyInfoContent() throws Zadanie4CustomException {
 
         Element keyInfoElement = (Element) document.getElementsByTagName("ds:KeyInfo").item(0);
 
@@ -581,13 +492,13 @@ public class SignatureChecker extends Verification {
                     "Element ds:Signature sa nenašiel");
         }
 
-        if (keyInfoElement.hasAttribute("Id") == false) {
+        if (!keyInfoElement.hasAttribute("Id")) {
 
             throw new Zadanie4CustomException(
                     "Element ds:Signature neobsahuje atribút Id");
         }
 
-        if (assertElementAttributeValue(keyInfoElement, "Id") == false) {
+        if (!assertElementAttributeValue(keyInfoElement, "Id")) {
 
             throw new Zadanie4CustomException(
                     "Atribút Id elementu ds:Signature neobsahuje žiadnu hodnotu");
@@ -638,7 +549,7 @@ public class SignatureChecker extends Verification {
                     "Element ds:X509IssuerSerial neobsahuje element ds:X509SerialNumber");
         }
 
-        X509CertificateObject certificate = null;
+        X509CertificateObject certificate;
         try {
             certificate = Zadanie4Helper.getCertificate(document);
 
@@ -652,25 +563,24 @@ public class SignatureChecker extends Verification {
         String certifSerialNumber = certificate.getSerialNumber().toString();
         String certifSubjectName = certificate.getSubjectX500Principal().toString();
 
-        if (xIssuerNameElement.getTextContent().equals(certifIssuerName) == false) {
+        if (!xIssuerNameElement.getTextContent().equals(certifIssuerName)) {
 
             throw new Zadanie4CustomException(
                     "Element ds:X509IssuerName sa nezhoduje s hodnotou na certifikáte");
         }
 
-        if (xSerialNumberElement.getTextContent().equals(certifSerialNumber) == false) {
+        if (!xSerialNumberElement.getTextContent().equals(certifSerialNumber)) {
 
             throw new Zadanie4CustomException(
                     "Element ds:X509SerialNumber sa nezhoduje s hodnotou na certifikáte");
         }
 
-        if (xSubjectNameElement.getTextContent().equals(certifSubjectName) == false) {
+        if (!xSubjectNameElement.getTextContent().equals(certifSubjectName)) {
 
             throw new Zadanie4CustomException(
                     "Element ds:X509SubjectName neobsahuje element ds:X509SerialNumber");
         }
 
-        return true;
     }
 
     /*
@@ -679,8 +589,7 @@ public class SignatureChecker extends Verification {
      * 	- musí obsahovať dva elementy ds:SignatureProperty pre xzep:SignatureVersion a xzep:ProductInfos,
      * 	- obidva ds:SignatureProperty musia mať atribút Target nastavený na ds:Signature
      */
-
-    public boolean verifySignaturePropertiesContent() throws Zadanie4CustomException {
+    public void verifySignaturePropertiesContent() throws Zadanie4CustomException {
 
         Element signaturePropertiesElement = (Element) document.getElementsByTagName("ds:SignatureProperties").item(0);
 
@@ -690,13 +599,13 @@ public class SignatureChecker extends Verification {
                     "Element ds:SignatureProperties sa nenašiel");
         }
 
-        if (signaturePropertiesElement.hasAttribute("Id") == false) {
+        if (!signaturePropertiesElement.hasAttribute("Id")) {
 
             throw new Zadanie4CustomException(
                     "Element ds:SignatureProperties neobsahuje atribút Id");
         }
 
-        if (assertElementAttributeValue(signaturePropertiesElement, "Id") == false) {
+        if (!assertElementAttributeValue(signaturePropertiesElement, "Id")) {
 
             throw new Zadanie4CustomException(
                     "Atribút Id elementu ds:SignatureProperties neobsahuje žiadnu hodnotu");
@@ -755,21 +664,20 @@ public class SignatureChecker extends Verification {
         String targetSigVer = sigVerParentElement.getAttribute("Target");
         String targetPInfo = pInfoParentElement.getAttribute("Target");
 
-        if (targetSigVer.equals("#" + signatureId) == false) {
+        if (!targetSigVer.equals("#" + signatureId)) {
 
             throw new Zadanie4CustomException(
                     "Atribút Target elementu xzep:SignatureVersion sa neodkazuje na daný ds:Signature");
 
         }
 
-        if (targetPInfo.equals("#" + signatureId) == false) {
+        if (!targetPInfo.equals("#" + signatureId)) {
 
             throw new Zadanie4CustomException(
                     "Atribút Target elementu xzep:ProductInfos sa neodkazuje na daný ds:Signature");
 
         }
 
-        return true;
     }
 
     /*
@@ -780,9 +688,9 @@ public class SignatureChecker extends Verification {
      * 	- overenie hodnoty Type atribútu voči profilu XAdES_ZEP,
      * 	- každý ds:Manifest element musí obsahovať práve jednu referenciu na ds:Object
      */
-    public boolean verifyManifestElements() throws Zadanie4CustomException {
+    public void verifyManifestElements() throws Zadanie4CustomException {
 
-        NodeList manifestElements = null;
+        NodeList manifestElements;
         try {
             manifestElements = XPathAPI.selectNodeList(document.getDocumentElement(), "//ds:Signature/ds:Object/ds:Manifest");
 
@@ -798,13 +706,13 @@ public class SignatureChecker extends Verification {
             /*
              * každý ds:Manifest element musí mať Id atribút,
              */
-            if (manifestElement.hasAttribute("Id") == false) {
+            if (!manifestElement.hasAttribute("Id")) {
 
                 throw new Zadanie4CustomException(
                         "Element ds:Manifest nema atribut Id");
             }
 
-            NodeList referenceElements = null;
+            NodeList referenceElements;
             try {
                 referenceElements = XPathAPI.selectNodeList(manifestElement, "ds:Reference");
 
@@ -823,7 +731,7 @@ public class SignatureChecker extends Verification {
         }
 
 
-        NodeList referenceElements = null;
+        NodeList referenceElements;
         try {
             referenceElements = XPathAPI.selectNodeList(document.getDocumentElement(), "//ds:Signature/ds:Object/ds:Manifest/ds:Reference");
         } catch (XPathException e) {
@@ -835,7 +743,7 @@ public class SignatureChecker extends Verification {
 
             Element referenceElement = (Element) referenceElements.item(i);
 
-            NodeList transformsElements = null;
+            NodeList transformsElements;
             try {
                 transformsElements = XPathAPI.selectNodeList(referenceElement, "ds:Transforms/ds:Transform");
 
@@ -852,14 +760,14 @@ public class SignatureChecker extends Verification {
                 /*
                  * ds:Transforms musí byť z množiny podporovaných algoritmov pre daný element podľa profilu XAdES_ZEP
                  */
-                if (assertElementAttributeValue(transformElement, "Algorithm", manifestTransformMethods) == false) {
+                if (!assertElementAttributeValue(transformElement, "Algorithm", manifestTransformMethods)) {
 
                     throw new Zadanie4CustomException(
                             "Element ds:Transform obsahuje nepovoleny typ algoritmu");
                 }
             }
 
-            Element digestMethodElement = null;
+            Element digestMethodElement;
             try {
                 digestMethodElement = (Element) XPathAPI.selectSingleNode(referenceElement, "ds:DigestMethod");
 
@@ -872,7 +780,7 @@ public class SignatureChecker extends Verification {
             /*
              * ds:DigestMethod – musí obsahovať URI niektorého z podporovaných algoritmov podľa profilu XAdES_ZEP
              */
-            if (assertElementAttributeValue(digestMethodElement, "Algorithm", digestMethods) == false) {
+            if (!assertElementAttributeValue(digestMethodElement, "Algorithm", digestMethods)) {
 
                 throw new Zadanie4CustomException(
                         "Atribút Algorithm elementu ds:DigestMethod neobsahuje URI niektorého z podporovaných algoritmov");
@@ -881,7 +789,7 @@ public class SignatureChecker extends Verification {
             /*
              * overenie hodnoty Type atribútu voči profilu XAdES_ZEP
              */
-            if (assertElementAttributeValue(referenceElement, "Type", "http://www.w3.org/2000/09/xmldsig#Object") == false) {
+            if (!assertElementAttributeValue(referenceElement, "Type", "http://www.w3.org/2000/09/xmldsig#Object")) {
 
                 throw new Zadanie4CustomException(
                         "Atribút Type elementu ds:Reference neobsahuje hodnotu http://www.w3.org/2000/09/xmldsig#Object");
@@ -889,7 +797,6 @@ public class SignatureChecker extends Verification {
 
         }
 
-        return true;
     }
 
     /*
@@ -897,9 +804,9 @@ public class SignatureChecker extends Verification {
      * 	- dereferencovanie URI, aplikovanie príslušnej ds:Transforms transformácie (pri base64 decode),
      * 	- overenie hodnoty ds:DigestValue
      */
-    public boolean verifyManifestElementsReferences() throws Zadanie4CustomException {
+    public void verifyManifestElementsReferences() throws Zadanie4CustomException {
 
-        NodeList referenceElements = null;
+        NodeList referenceElements;
         try {
             referenceElements = XPathAPI.selectNodeList(document.getDocumentElement(), "//ds:Signature/ds:Object/ds:Manifest/ds:Reference");
 
@@ -930,7 +837,7 @@ public class SignatureChecker extends Verification {
 
                 String transformMethod = transformElement.getAttribute("Algorithm");
 
-                byte[] objectElementBytes = null;
+                byte[] objectElementBytes;
 
                 try {
                     objectElementBytes = Zadanie4Helper.fromElementToString(objectElement).getBytes();
@@ -941,25 +848,14 @@ public class SignatureChecker extends Verification {
                             "Overenie referencií v elementoch ds:Manifest zlyhalo. Chyba pri tranformacii z Element do String", e);
                 }
 
-                if ("http://www.w3.org/TR/2001/REC-xml-c14n-20010315".equals(transformMethod)) {
-
-                    try {
-                        Canonicalizer canonicalizer = Canonicalizer.getInstance(transformMethod);
-                        objectElementBytes = canonicalizer.canonicalize(objectElementBytes);
-
-                    } catch (SAXException | InvalidCanonicalizerException | CanonicalizationException |
-                             ParserConfigurationException | IOException e) {
-
-                        throw new Zadanie4CustomException("Core validation zlyhala. Chyba pri kanonikalizacii", e);
-                    }
-                }
+                objectElementBytes = getBytes(transformMethod, objectElementBytes);
 
                 if ("http://www.w3.org/2000/09/xmldsig#base64".equals(transformMethod)) {
 
                     objectElementBytes = Base64.decode(objectElementBytes);
                 }
 
-                MessageDigest messageDigest = null;
+                MessageDigest messageDigest;
                 try {
                     messageDigest = MessageDigest.getInstance(digestMethod);
 
@@ -972,7 +868,7 @@ public class SignatureChecker extends Verification {
                 String actualDigestValue = new String(Base64.encode(messageDigest.digest(objectElementBytes)));
                 String expectedDigestValue = digestValueElement.getTextContent();
 
-                if (expectedDigestValue.equals(actualDigestValue) == false) {
+                if (!expectedDigestValue.equals(actualDigestValue)) {
 
                     throw new Zadanie4CustomException(
                             "Hodnota ds:DigestValue elementu ds:Reference sa nezhoduje s hash hodnotou elementu ds:Manifest.");
@@ -980,6 +876,21 @@ public class SignatureChecker extends Verification {
             }
         }
 
-        return true;
+    }
+
+    private byte[] getBytes(String transformMethod, byte[] objectElementBytes) throws Zadanie4CustomException {
+        if ("http://www.w3.org/TR/2001/REC-xml-c14n-20010315".equals(transformMethod)) {
+
+            try {
+                Canonicalizer canonicalizer = Canonicalizer.getInstance(transformMethod);
+                objectElementBytes = canonicalizer.canonicalize(objectElementBytes);
+
+            } catch (SAXException | InvalidCanonicalizerException | CanonicalizationException |
+                     ParserConfigurationException | IOException e) {
+
+                throw new Zadanie4CustomException("Core validation zlyhala. Chyba pri kanonikalizacii", e);
+            }
+        }
+        return objectElementBytes;
     }
 }

@@ -6,6 +6,7 @@ import fiit.stulib.sipvsbe.service.IVerificationService;
 import fiit.stulib.sipvsbe.service.impl.util.SignatureChecker;
 import fiit.stulib.sipvsbe.service.impl.util.Zadanie4Helper;
 import lombok.extern.slf4j.Slf4j;
+import org.bouncycastle.cert.X509CertificateHolder;
 import org.springframework.stereotype.Service;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -18,78 +19,14 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.security.cert.X509CRL;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 @Slf4j
 @Service
 public class VerificationService implements IVerificationService {
-
-    private static String getPath(int fileNumber) {
-        return AppConfig.XMLS_TO_VERIFY_PATH + buildFilename(fileNumber);
-    }
-
-    private static String buildFilename(int fileNumber) {
-        return String.format("%02d", fileNumber) + AppConfig.SIGNED_FILE;
-    }
-
-    private static File getFile(String filePath) {
-        Path path = Paths.get(filePath);
-        return path.toFile();
-    }
-
-    private static Document getRootDocument(File fileToVerify) {
-        DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-        DocumentBuilder builder = null;
-        Document document = null;
-
-        try {
-            builder = factory.newDocumentBuilder();
-            document = builder.parse(fileToVerify);
-        } catch (ParserConfigurationException | SAXException | IOException e) {
-            throw new RuntimeException(e.getMessage());
-        }
-
-        return document;
-    }
-
-    // 1. OVERENIE DATOVEJ OBALKY
-    private static String checkDataEnvelop(Element rootElement) {
-        if (Zadanie4Helper.checkNamespace(rootElement)) {
-            return null;
-        } else {
-            return "overenie datovej obalky: nespravny namespace";
-        }
-    }
-
-    /*
-    // --- VERIFYING FUNCTIONS ---
-     */
-
-    // 2. OVERENIE XML SIGNATURE
-    private static String checkXMLSignature(Element rootElement) {
-        String signatureMethod = Zadanie4Helper.getAttributeValue(rootElement, "ds:SignatureMethod", "Algorithm");
-        String canonicalizationMethod = Zadanie4Helper.getAttributeValue(rootElement, "ds:CanonicalizationMethod", "Algorithm");
-
-        List<String> allowedAlghoritms = new ArrayList<>();
-        allowedAlghoritms.add("http://www.w3.org/2000/09/xmldsig#dsa-sha1");
-        allowedAlghoritms.add("http://www.w3.org/2000/09/xmldsig#rsa-sha1");
-        allowedAlghoritms.add("http://www.w3.org/2001/04/xmldsig-more#rsa-sha256");
-        allowedAlghoritms.add("http://www.w3.org/2001/04/xmldsig-more#rsa-sha384");
-        allowedAlghoritms.add("http://www.w3.org/2001/04/xmldsig-more#rsa-sha512");
-        allowedAlghoritms.add("http://www.w3.org/2000/09/xmldsig#sha1");
-        allowedAlghoritms.add("http://www.w3.org/2001/04/xmldsig");
-        allowedAlghoritms.add("http://www.w3.org/2001/04/xmlenc#sha256");
-        allowedAlghoritms.add("http://www.w3.org/2001/04/xmldsig-more#sha384");
-        allowedAlghoritms.add("http://www.w3.org/2001/04/xmlenc#sha512");
-
-        if (!allowedAlghoritms.contains(signatureMethod) ||
-                !canonicalizationMethod.equals("http://www.w3.org/TR/2001/REC-xml-c14n-20010315")) {
-            return "overenie xml signature: nespravny SignatureMethod alebo CanonicalizationMethod";
-        }
-
-        return null;
-    }
 
     @Override
     public List<VerifyResultDto> verify() {
@@ -158,12 +95,111 @@ public class VerificationService implements IVerificationService {
             }
 
             // timestamp check
-
+            String checkTimestampResult = checkTimestamp(rootElement);
+            if (checkTimestampResult != null) {
+                result.setErrorMsg(checkTimestampResult);
+                results.add(result);
+                continue;
+            }
 
             results.add(result);
         }
 
         return results;
+    }
+
+    private static String getPath(int fileNumber) {
+        return AppConfig.XMLS_TO_VERIFY_PATH + buildFilename(fileNumber);
+    }
+
+    private static String buildFilename(int fileNumber) {
+        return String.format("%02d", fileNumber) + AppConfig.SIGNED_FILE;
+    }
+
+    private static File getFile(String filePath) {
+        Path path = Paths.get(filePath);
+        return path.toFile();
+    }
+
+    private static Document getRootDocument(File fileToVerify) {
+        DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+        DocumentBuilder builder = null;
+        Document document = null;
+
+        try {
+            builder = factory.newDocumentBuilder();
+            document = builder.parse(fileToVerify);
+        } catch (ParserConfigurationException | SAXException | IOException e) {
+            throw new RuntimeException(e.getMessage());
+        }
+
+        return document;
+    }
+
+    // 1. OVERENIE DATOVEJ OBALKY
+    private static String checkDataEnvelop(Element rootElement) {
+        if (Zadanie4Helper.checkNamespace(rootElement)) {
+            return null;
+        } else {
+            return "overenie datovej obalky: nespravny namespace";
+        }
+    }
+
+    /*
+    // --- VERIFYING FUNCTIONS ---
+     */
+
+    // 2. OVERENIE XML SIGNATURE
+    private static String checkXMLSignature(Element rootElement) {
+        String signatureMethod = Zadanie4Helper.getAttributeValue(rootElement, "ds:SignatureMethod", "Algorithm");
+        String canonicalizationMethod = Zadanie4Helper.getAttributeValue(rootElement, "ds:CanonicalizationMethod", "Algorithm");
+
+        List<String> allowedAlghoritms = new ArrayList<>();
+        allowedAlghoritms.add("http://www.w3.org/2000/09/xmldsig#dsa-sha1");
+        allowedAlghoritms.add("http://www.w3.org/2000/09/xmldsig#rsa-sha1");
+        allowedAlghoritms.add("http://www.w3.org/2001/04/xmldsig-more#rsa-sha256");
+        allowedAlghoritms.add("http://www.w3.org/2001/04/xmldsig-more#rsa-sha384");
+        allowedAlghoritms.add("http://www.w3.org/2001/04/xmldsig-more#rsa-sha512");
+        allowedAlghoritms.add("http://www.w3.org/2000/09/xmldsig#sha1");
+        allowedAlghoritms.add("http://www.w3.org/2001/04/xmldsig");
+        allowedAlghoritms.add("http://www.w3.org/2001/04/xmlenc#sha256");
+        allowedAlghoritms.add("http://www.w3.org/2001/04/xmldsig-more#sha384");
+        allowedAlghoritms.add("http://www.w3.org/2001/04/xmlenc#sha512");
+
+        if (!allowedAlghoritms.contains(signatureMethod) ||
+                !canonicalizationMethod.equals("http://www.w3.org/TR/2001/REC-xml-c14n-20010315")) {
+            return "overenie xml signature: nespravny SignatureMethod alebo CanonicalizationMethod";
+        }
+
+        return null;
+    }
+
+    // 4. OVERENIE CASOVEJ PECIATKY
+    private String checkTimestamp(Element rootElement) {
+        String timestamp = Zadanie4Helper.getNodeValue(rootElement, "xades:EncapsulatedTimeStamp");
+        try {
+            byte[] timestampBytes = java.util.Base64.getDecoder().decode(timestamp);
+            X509CertificateHolder tsCert = Zadanie4Helper.getTimeStampSignatureCertificate(timestampBytes);
+
+            if (tsCert == null){
+                return "Overenie casovej peciatky: casova peciatka nebola najdena";
+            }
+
+            if (!tsCert.isValidOn(new Date())){
+                return "Overenie casovej peciatky: neplatny cas voci aktualnemu datumu.";
+            }
+
+            X509CRL crl = Zadanie4Helper.getCRL("http://test.ditec.sk/TSAServer/crl/dtctsa.crl");
+
+            if (crl.getRevokedCertificate(tsCert.getSerialNumber()) != null){
+                return "Overenie casovej peciatky: neplatny certifikat podla CRL";
+            }
+
+            return Zadanie4Helper.checkMessageImprint(timestampBytes, rootElement);
+
+        } catch (Exception e) {
+            return e.getMessage();
+        }
     }
 
 

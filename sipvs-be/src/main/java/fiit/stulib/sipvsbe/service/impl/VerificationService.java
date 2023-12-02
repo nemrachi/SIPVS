@@ -31,94 +31,6 @@ import java.util.List;
 @Service
 public class VerificationService implements IVerificationService {
 
-    @Override
-    public List<VerifyResultDto> verify() {
-        List<VerifyResultDto> results = new ArrayList<>();
-
-        for (int i = 1; i < 14; i++) {
-            VerifyResultDto result = new VerifyResultDto();
-            result.setFilename(buildFilename(i));
-
-            File fileToVerify = getFile(getPath(i));
-            Document document = getRootDocument(fileToVerify);
-            Element rootElement = document.getDocumentElement();
-
-
-            // data envelope check
-            String checkDataEnvelopResult = checkDataEnvelop(rootElement);
-            if (checkDataEnvelopResult != null) {
-                result.setErrorMsg(checkDataEnvelopResult);
-                results.add(result);
-                continue;
-            }
-
-            // signatureMethod and canonicalizationMethod check
-            String checkXMLSignatureResult = checkXMLSignature(rootElement);
-            if (checkXMLSignatureResult != null) {
-                result.setErrorMsg(checkXMLSignatureResult);
-                results.add(result);
-                continue;
-            }
-
-            // signature check
-            SignatureChecker signatureChecker = new SignatureChecker(document);
-            try {
-                //Elementy ds:Transforms a ds:DigestMethod
-                signatureChecker.verifyTransformsAndDigestMethod();
-
-                //Core validation
-                signatureChecker.verifyCoreReferencesAndDigestValue();
-                signatureChecker.verifyCoreSignatureValue();
-
-                //Element ds:Signature:
-                signatureChecker.verifySignature();
-
-                //Element ds:SignatureValue
-                signatureChecker.verifySignatureValueId();
-
-                //Referencie v Signedinfo
-                signatureChecker.verifySignedInfoReferencesAndAttributeValues();
-
-                //Element ds:KeyInfo
-                signatureChecker.verifyKeyInfoContent();
-
-                //Element ds:SignatureProperties
-                signatureChecker.verifySignaturePropertiesContent();
-
-                //Elementy ds:Manifest
-                signatureChecker.verifyManifestElements();
-
-                //Referencie ds:Manifest elementov
-                signatureChecker.verifyManifestElementsReferences();
-
-            } catch (Exception e) {
-                result.setErrorMsg(e.getMessage());
-                results.add(result);
-                continue;
-            }
-
-            // timestamp check
-            String checkTimestampResult = checkTimestamp(rootElement);
-            if (checkTimestampResult != null) {
-                result.setErrorMsg(checkTimestampResult);
-                results.add(result);
-                continue;
-            }
-
-            // sign certificate check
-            String checkSignCertResult = checkSignCert(rootElement);
-            if (checkSignCertResult != null) {
-                result.setErrorMsg(checkSignCertResult);
-                results.add(result);
-                continue;
-            }
-
-            results.add(result);
-        }
-
-        return results;
-    }
-
     private static String getPath(int fileNumber) {
         return AppConfig.XMLS_TO_VERIFY_PATH + buildFilename(fileNumber);
     }
@@ -243,6 +155,94 @@ public class VerificationService implements IVerificationService {
         }
 
         return null;
+    }
+
+    @Override
+    public List<VerifyResultDto> verify() {
+        List<VerifyResultDto> results = new ArrayList<>();
+
+        for (int i = 1; i < 14; i++) {
+            VerifyResultDto result = new VerifyResultDto();
+            result.setFilename(buildFilename(i));
+
+            File fileToVerify = getFile(getPath(i));
+            Document document = getRootDocument(fileToVerify);
+            Element rootElement = document.getDocumentElement();
+
+
+            // data envelope check
+            String checkDataEnvelopResult = checkDataEnvelop(rootElement);
+            if (checkDataEnvelopResult != null) {
+                result.setErrorMsg(checkDataEnvelopResult);
+                results.add(result);
+                continue;
+            }
+
+            // signatureMethod and canonicalizationMethod check
+            String checkXMLSignatureResult = checkXMLSignature(rootElement);
+            if (checkXMLSignatureResult != null) {
+                result.setErrorMsg(checkXMLSignatureResult);
+                results.add(result);
+                continue;
+            }
+
+            // signature check
+            SignatureChecker signatureChecker = new SignatureChecker(document);
+            try {
+                //Elementy ds:Transforms a ds:DigestMethod
+                signatureChecker.verifyTransformsAndDigestMethod();
+
+                //Core validation
+                signatureChecker.verifyCoreReferencesAndDigestValue();
+                signatureChecker.verifyCoreSignatureValue();
+
+                //Element ds:Signature:
+                signatureChecker.verifySignature();
+
+                //Element ds:SignatureValue
+                signatureChecker.verifySignatureValueId();
+
+                //Referencie v Signedinfo
+                signatureChecker.verifySignedInfoReferencesAndAttributeValues();
+
+                //Element ds:KeyInfo
+                signatureChecker.verifyKeyInfoContent();
+
+                //Element ds:SignatureProperties
+                signatureChecker.verifySignaturePropertiesContent();
+
+                //Elementy ds:Manifest
+                signatureChecker.verifyManifestElements();
+
+                //Referencie ds:Manifest elementov
+                signatureChecker.verifyManifestElementsReferences();
+
+            } catch (Exception e) {
+                result.setErrorMsg(e.getMessage());
+                results.add(result);
+                continue;
+            }
+
+            // timestamp check
+            String checkTimestampResult = checkTimestamp(rootElement);
+            if (checkTimestampResult != null) {
+                result.setErrorMsg(checkTimestampResult);
+                results.add(result);
+                continue;
+            }
+
+            // sign certificate check
+            String checkSignCertResult = checkSignCert(rootElement);
+            if (checkSignCertResult != null) {
+                result.setErrorMsg(checkSignCertResult);
+                results.add(result);
+                continue;
+            }
+
+            results.add(result);
+        }
+
+        return results;
     }
 
 

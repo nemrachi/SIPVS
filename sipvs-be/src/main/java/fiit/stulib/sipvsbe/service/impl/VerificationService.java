@@ -119,7 +119,7 @@ public class VerificationService implements IVerificationService {
         }
     }
 
-    // 3. Overenie certu
+    // 3. OVERENIE PODPIS CERTU
     private static String checkSignCert(Element rootElement) {
         try {
             String certValue = Zadanie4Helper.getNodeValue(rootElement, "ds:X509Certificate");

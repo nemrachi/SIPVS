@@ -21,20 +21,9 @@ import java.security.cert.X509Certificate;
 import java.util.*;
 
 public class SignatureChecker extends Verification {
-    private final List<String> manifestTransformMethods = new ArrayList<>(Arrays.asList(
-            "http://www.w3.org/TR/2001/REC-xml-c14n-20010315",
-            "http://www.w3.org/2000/09/xmldsig#base64"));
-
-    private final List<String> digestMethods = new ArrayList<>(Arrays.asList(
-            "http://www.w3.org/2000/09/xmldsig#sha1",
-            "http://www.w3.org/2001/04/xmldsig-more#sha224",
-            "http://www.w3.org/2001/04/xmlenc#sha256",
-            "http://www.w3.org/2001/04/xmldsig-more#sha384",
-            "http://www.w3.org/2001/04/xmlenc#sha512"));
-
-    private final List<String> transformMethods = new ArrayList<>(Collections.singletonList("http://www.w3.org/TR/2001/REC-xml-c14n-20010315"));
-
     private static final Map<String, String> DIGEST_ALG;
+    private static final Map<String, String> SIGN_ALG;
+    private static final Map<String, String> REFERENCES;
 
     static {
         DIGEST_ALG = new HashMap<>();
@@ -45,8 +34,6 @@ public class SignatureChecker extends Verification {
         DIGEST_ALG.put("http://www.w3.org/2001/04/xmlenc#sha512", "SHA-512");
     }
 
-    private static final Map<String, String> SIGN_ALG;
-
     static {
         SIGN_ALG = new HashMap<>();
         SIGN_ALG.put("http://www.w3.org/2000/09/xmldsig#dsa-sha1", "SHA1withDSA");
@@ -56,8 +43,6 @@ public class SignatureChecker extends Verification {
         SIGN_ALG.put("http://www.w3.org/2001/04/xmldsig-more#rsa-sha512", "SHA512withRSA");
     }
 
-    private static final Map<String, String> REFERENCES;
-
     static {
         REFERENCES = new HashMap<>();
         REFERENCES.put("ds:KeyInfo", "http://www.w3.org/2000/09/xmldsig#Object");
@@ -65,6 +50,17 @@ public class SignatureChecker extends Verification {
         REFERENCES.put("xades:SignedProperties", "http://uri.etsi.org/01903#SignedProperties");
         REFERENCES.put("ds:Manifest", "http://www.w3.org/2000/09/xmldsig#Manifest");
     }
+
+    private final List<String> manifestTransformMethods = new ArrayList<>(Arrays.asList(
+            "http://www.w3.org/TR/2001/REC-xml-c14n-20010315",
+            "http://www.w3.org/2000/09/xmldsig#base64"));
+    private final List<String> digestMethods = new ArrayList<>(Arrays.asList(
+            "http://www.w3.org/2000/09/xmldsig#sha1",
+            "http://www.w3.org/2001/04/xmldsig-more#sha224",
+            "http://www.w3.org/2001/04/xmlenc#sha256",
+            "http://www.w3.org/2001/04/xmldsig-more#sha384",
+            "http://www.w3.org/2001/04/xmlenc#sha512"));
+    private final List<String> transformMethods = new ArrayList<>(Collections.singletonList("http://www.w3.org/TR/2001/REC-xml-c14n-20010315"));
 
 
     public SignatureChecker(Document document) {

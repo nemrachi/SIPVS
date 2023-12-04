@@ -116,19 +116,19 @@ public class Zadanie4Helper {
         Element keyInfoElement = (Element) document.getElementsByTagName("ds:KeyInfo").item(0);
 
         if (keyInfoElement == null) {
-            throw new Zadanie4CustomException("Chyba pri ziskavani certifikatu: Dokument neobsahuje element ds:KeyInfo");
+            throw new Zadanie4CustomException("[CERTIFICATE-ERROR]: Dokument musi obashovat element ds:KeyInfo");
         }
 
         Element x509DataElement = (Element) keyInfoElement.getElementsByTagName("ds:X509Data").item(0);
 
         if (x509DataElement == null) {
-            throw new Zadanie4CustomException("Chyba pri ziskavani certifikatu: Dokument neobsahuje element ds:X509Data");
+            throw new Zadanie4CustomException("[CERTIFICATE-ERROR]: Dokument musi obashovat element ds:X509Data");
         }
 
         Element x509Certificate = (Element) x509DataElement.getElementsByTagName("ds:X509Certificate").item(0);
 
         if (x509Certificate == null) {
-            throw new Zadanie4CustomException("Chyba pri ziskavani certifikatu: Dokument neobsahuje element ds:X509Certificate");
+            throw new Zadanie4CustomException("[CERTIFICATE-ERROR]: Dokument musi obashovat element ds:X509Certificate");
         }
 
         X509CertificateObject certObject;
@@ -139,7 +139,7 @@ public class Zadanie4Helper {
             ASN1Sequence sequence = (ASN1Sequence) inputStream.readObject();
             certObject = new X509CertificateObject(Certificate.getInstance(sequence));
         } catch (Exception e) {
-            throw new Exception("Certifikát nebolo možné načítať", e);
+            throw new Exception("[CERTIFICATE-ERROR]: certifikát nebolo možné načítať", e);
         } finally {
             if (inputStream != null) {
                 try {
@@ -220,7 +220,7 @@ public class Zadanie4Helper {
             String signatureValue = getNodeValue(root, "ds:SignatureValue");
 
             if (signatureValue.isEmpty()) {
-                return "Overenie casovej peciatky: SignatureValue nebol najdeny";
+                return "[TIMESTAMP-ERROR]: SignatureValue nebol najdeny";
             }
 
             byte[] signatureValueBytes = java.util.Base64.getDecoder().decode(signatureValue.getBytes());
@@ -231,11 +231,11 @@ public class Zadanie4Helper {
             try {
                 messageDigest = MessageDigest.getInstance(alghoritm, "BC");
             } catch (Exception e) {
-                return "Overenie casovej peciatky: neznamy algoritmus v MI.";
+                return "[TIMESTAMP-ERROR]: neznamy algoritmus v MI.";
             }
 
             if (!Arrays.equals(MI, messageDigest.digest(signatureValueBytes))) {
-                return "Overenie casovej peciatky: MI z casovej peciatky a podpis v SignatureValue sa nezhoduju.";
+                return "[TIMESTAMP-ERROR]: MI z casovej peciatky a podpis v SignatureValue sa nezhoduju.";
             }
 
             return null;

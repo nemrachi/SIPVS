@@ -62,7 +62,7 @@ public class VerificationService implements IVerificationService {
         if (Zadanie4Helper.checkNamespace(rootElement)) {
             return null;
         } else {
-            return "overenie datovej obalky: nespravny namespace";
+            return "[WRONG-ATTRIBUTES]: koreňový element musí obsahovať atribúty xmlns:xzep a xmlns:ds podľa profilu XADES_ZEP";
         }
     }
 
@@ -85,7 +85,8 @@ public class VerificationService implements IVerificationService {
 
         if (!allowedAlghoritms.contains(signatureMethod) ||
                 !canonicalizationMethod.equals("http://www.w3.org/TR/2001/REC-xml-c14n-20010315")) {
-            return "overenie xml signature: nespravny SignatureMethod alebo CanonicalizationMethod";
+            return "[SIGNATURE]: ds:SignatureMethod a ds:CanonicalizationMethod – musia obsahovať URI niektorého z podporovaných algoritmov pre dané elementy podľa profilu XAdES_ZEP";
+
         }
 
         return null;

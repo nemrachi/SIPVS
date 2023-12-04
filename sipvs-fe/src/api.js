@@ -102,11 +102,11 @@ export const uploadTimeStampFile = async (formData) => {
 
 export const uploadDocsCheckFile = async (formData) => {
   try {
-    return await axios.get("/api/zadanie4/verify", formData, {
+    return await axios.get("/api/zadanie4/verify", {
       headers: {
         "Content-Type": "multipart/form-data",
       },
-      responseType: "blob"
+      // responseType: "blob"
     });
 
   } catch (error) {

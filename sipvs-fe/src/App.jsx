@@ -83,16 +83,18 @@ function App() {
   };
 
   const handleDocsCheckUpload = () => {
-      if (selectedDocsCheckFile) {
+    // TODO uncomment if uploading file is needed
+      // if (selectedDocsCheckFile) {
           const formData = new FormData();
-          formData.append("file", selectedDocsCheckFile);
+          // TODO uncomment if uploading file is needed
+          // formData.append("file", selectedDocsCheckFile);
 
           uploadDocsCheckFile(formData).then((response) => {
             setCheckedDocs(response.data)
           });
-      } else {
-          console.log("No file selected");
-      }
+      // } else {
+      //     console.log("No file selected");
+      // }
   };
 
   const handleSign = () => {
@@ -276,13 +278,14 @@ function App() {
         </div>
         <hr />
         <div>
-          <input type="file" onChange={handleDocsCheckFileChange} className="mb-1" />
+          {/*TODO uncomment if uploading file is needed*/}
+          {/*<input type="file" onChange={handleDocsCheckFileChange} className="mb-1" />*/}
           <button
               type="button"
               className="button-gray button-extra"
               onClick={handleDocsCheckUpload}
           >
-            Over platnosť dokumentov
+            Verify the validity of documents
           </button>
         </div>
         {!!checkedDocs.length && <div>

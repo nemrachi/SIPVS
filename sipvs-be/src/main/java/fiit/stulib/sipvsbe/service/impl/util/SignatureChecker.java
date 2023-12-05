@@ -303,8 +303,8 @@ public class SignatureChecker extends Verification {
 
     /*
      Element ds:Signature:
-     - musí mať Id atribut,
-     - musí mať špecifikovaný namespace xmlns:ds
+     musí mať Id atribut,
+     musí mať špecifikovaný namespace xmlns:ds
      */
     public void verifySignature() throws Zadanie4CustomException {
         Element signatureElement = (Element) document.getElementsByTagName("ds:Signature").item(0);
@@ -322,8 +322,7 @@ public class SignatureChecker extends Verification {
     }
 
     /*
-     * Element ds:SignatureValue
-     * 	– musí mať Id atribut
+     * Element ds:SignatureValue musí mať Id atribut
      */
     public void verifySignatureValueId() throws Zadanie4CustomException {
         Element signatureValueElement = (Element) document.getElementsByTagName("ds:SignatureValue").item(0);
@@ -411,9 +410,9 @@ public class SignatureChecker extends Verification {
 
     /*
      * Overenie obsahu ds:SignatureProperties:
-     * 	- musí mať Id atribut,
-     * 	- musí obsahovať dva elementy ds:SignatureProperty pre xzep:SignatureVersion a xzep:ProductInfos,
-     * 	- obidva ds:SignatureProperty musia mať atribut Target nastavený na ds:Signature
+     * 	musí mať Id atribut,
+     * 	musí obsahovať dva elementy ds:SignatureProperty pre xzep:SignatureVersion a xzep:ProductInfos,
+     * 	obidva ds:SignatureProperty musia mať atribut Target nastavený na ds:Signature
      */
     public void verifySignaturePropertiesContent() throws Zadanie4CustomException {
         Element signaturePropertiesElement = (Element) document.getElementsByTagName("ds:SignatureProperties").item(0);
@@ -486,10 +485,10 @@ public class SignatureChecker extends Verification {
 
     /*
      * Overenie existencie referencií v ds:SignedInfo a hodnôt atributov Id a Type voči profilu XAdES_ZEP pre:
-     * 	- ds:KeyInfo element,
-     * 	- ds:SignatureProperties element,
-     * 	- xades:SignedProperties element,
-     * 	- všetky ostatné referencie v rámci ds:SignedInfo musia byť referenciami na ds:Manifest elementy
+     * ds:KeyInfo element,
+     * ds:SignatureProperties element,
+     * xades:SignedProperties element,
+     * všetky ostatné referencie v rámci ds:SignedInfo musia byť referenciami na ds:Manifest elementy
      */
     public void verifySignedInfoReferencesAndAttributeValues() throws Zadanie4CustomException {
 
@@ -589,11 +588,11 @@ public class SignatureChecker extends Verification {
 
     /*
      * Overenie ds:Manifest elementov:
-     * 	- každý ds:Manifest element musí mať Id atribut,
-     * 	- ds:Transforms musí byť z množiny podporovaných algoritmov pre daný element podľa profilu XAdES_ZEP,
-     * 	- ds:DigestMethod – musí obsahovať URI niektorého z podporovaných algoritmov podľa profilu XAdES_ZEP,
-     * 	- overenie hodnoty Type atributu voči profilu XAdES_ZEP,
-     * 	- každý ds:Manifest element musí obsahovať práve jednu referenciu na ds:Object
+     * každý ds:Manifest element musí mať Id atribut,
+     * ds:Transforms musí byť z množiny podporovaných algoritmov pre daný element podľa profilu XAdES_ZEP,
+     * ds:DigestMethod – musí obsahovať URI niektorého z podporovaných algoritmov podľa profilu XAdES_ZEP,
+     * overenie hodnoty Type atributu voči profilu XAdES_ZEP,
+     * každý ds:Manifest element musí obsahovať práve jednu referenciu na ds:Object
      */
     public void verifyManifestElements() throws Zadanie4CustomException {
         NodeList manifestElements;

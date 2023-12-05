@@ -73,24 +73,12 @@ export const confirmData = async (loan) => {
 
     const response = await axios.post("/api/zadanie1/save", data_to_send);
     alert("Submited!");
-    // UNCOMMENT TO DOWNLOAD FILE
-    //
-    // const blob = new Blob([response.data], {type: response.headers['content-type']});
-    // const url = window.URL.createObjectURL(blob);
-    //
-    // const a = document.createElement('a');
-    // a.href = url;
-    // a.download = 'returned_file.txt';
-    //
-    // a.click();
-    //
-    // window.URL.revokeObjectURL(url);
   } catch (error) {
     alert(error.response.data);
   }
 };
 
-export const uploadFile = async (formData) => {
+export const uploadTimeStampFile = async (formData) => {
   try {
     const response = await axios.post("/api/zadanie3/timestamp", formData, {
       headers: {
@@ -107,6 +95,20 @@ export const uploadFile = async (formData) => {
     downloadLink.click();
 
     console.log("File download successful!");
+  } catch (error) {
+    console.error("Error downloading file:", error);
+  }
+};
+
+export const uploadDocsCheckFile = async (formData) => {
+  try {
+    return await axios.get("/api/zadanie4/verify", {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+      // responseType: "blob"
+    });
+
   } catch (error) {
     console.error("Error downloading file:", error);
   }

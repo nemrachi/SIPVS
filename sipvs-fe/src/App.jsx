@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { validateData, transformData, confirmData, uploadFile } from "./api";
+import {validateData, transformData, confirmData, uploadTimeStampFile, uploadDocsCheckFile} from "./api";
 
 import SignComponent from "./SignComponent";
 
@@ -15,7 +15,9 @@ function App() {
     loanedBooks: [{ isbn: "" }],
   };
   const [loan, setLoan] = useState(EMPTY_LOAN);
-  const [selectedFile, setSelectedFile] = useState(null);
+  const [selectedTimeStampFile, setSelectedTimeStampFile] = useState(null);
+  const [selectedDocsCheckFile, setSelectedDocsCheckFile] = useState(null);
+  const [checkedDocs, setCheckedDocs] = useState([]);
 
   const handleChange = (e, nested) => {
     const value = e.target.value;
@@ -61,19 +63,38 @@ function App() {
     console.log(loan);
   };
 
-  const handleFileChange = (event) => {
-    setSelectedFile(event.target.files[0]);
+  const handleTimeStampFileChange = (event) => {
+    setSelectedTimeStampFile(event.target.files[0]);
   };
 
-  const handleUpload = () => {
-    if (selectedFile) {
+  const handleTimeStampUpload = () => {
+    if (selectedTimeStampFile) {
       const formData = new FormData();
-      formData.append("file", selectedFile);
+      formData.append("file", selectedTimeStampFile);
 
-      uploadFile(formData).then((r) => console.log(r));
+      uploadTimeStampFile(formData).then((r) => console.log(r));
     } else {
       console.log("No file selected");
     }
+  };
+
+  const handleDocsCheckFileChange = (event) => {
+    setSelectedDocsCheckFile(event.target.files[0]);
+  };
+
+  const handleDocsCheckUpload = () => {
+    // TODO uncomment if uploading file is needed
+      // if (selectedDocsCheckFile) {
+          const formData = new FormData();
+          // TODO uncomment if uploading file is needed
+          // formData.append("file", selectedDocsCheckFile);
+
+          uploadDocsCheckFile(formData).then((response) => {
+            setCheckedDocs(response.data)
+          });
+      // } else {
+      //     console.log("No file selected");
+      // }
   };
 
   const handleSign = () => {
@@ -85,6 +106,7 @@ function App() {
       return !pattern.test(value) && value.length > 1;
     }
   };
+
   return (
     <main className="">
       <form className="" onSubmit={handleSubmit}>
@@ -243,16 +265,45 @@ function App() {
         <button className="button-gray" type="button" onClick={handleSign}>
           Sign data
         </button>
-        <div style={{ paddingTop: "10px" }}>
-          <input type="file" onChange={handleFileChange} />
+        <hr />
+        <div>
+          <input type="file" onChange={handleTimeStampFileChange} className="mb-1" />
           <button
             type="button"
             className="button-gray button-extra"
-            onClick={handleUpload}
+            onClick={handleTimeStampUpload}
           >
             Add timestamp
           </button>
         </div>
+        <hr />
+        <div>
+          {/*TODO uncomment if uploading file is needed*/}
+          {/*<input type="file" onChange={handleDocsCheckFileChange} className="mb-1" />*/}
+          <button
+              type="button"
+              className="button-gray button-extra"
+              onClick={handleDocsCheckUpload}
+          >
+            Verify the validity of documents
+          </button>
+        </div>
+        {!!checkedDocs.length && <div>
+          <h3>Checked documents</h3>
+          {checkedDocs.map(doc => {
+            console.log(doc)
+            return <div className="document-status">
+              <div className="document-status__header">
+                <strong>{doc.filename}</strong>
+                {!doc.errorMsg ? <strong className="color-green">OK</strong> : <strong className="color-red">FAIL</strong>}
+              </div>
+              <div className="document-status__body">
+                <div>{doc.errorMsg}</div>
+              </div>
+              <hr/>
+            </div>
+          })}
+        </div>}
       </form>
     </main>
   );
